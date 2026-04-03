@@ -1,231 +1,41 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#eadbc7" />
-  <title>Xanadu</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="theme.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xanadu</title>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand-block">
-        <h1 class="brand">Xanadu</h1>
-        <p class="brand-subtitle">biblioteca local, cálida y offline</p>
-      </div>
+<div class="layout">
 
-      <div class="sidebar-section">
-        <input id="searchInput" class="search-input" placeholder="🔎  Buscar..." />
-      </div>
+<aside class="sidebar">
+  <h1 class="brand">Xanadu</h1>
+  <input id="search" placeholder="Buscar...">
+</aside>
 
-      <div class="sidebar-section">
-        <div class="section-title">Vista</div>
-        <div id="viewChips" class="chip-wrap"></div>
-      </div>
+<main class="main">
+  <header class="hero">
+    <h2 id="title">Biblioteca</h2>
+    <div id="count">0</div>
+  </header>
 
-      <div class="sidebar-section">
-        <div class="section-title">Orden</div>
-        <div id="sortChips" class="chip-wrap"></div>
-      </div>
+  <div id="grid" class="grid"></div>
+  <div id="empty" class="empty">No hay ítems</div>
+</main>
 
-      <div class="sidebar-section">
-        <div class="section-title">Década</div>
-        <div id="decadeChips" class="chip-wrap"></div>
-      </div>
+</div>
 
-      <div class="sidebar-section">
-        <div class="section-title">Idioma</div>
-        <div id="languageChips" class="chip-wrap"></div>
-      </div>
+<button id="add">＋</button>
 
-      <div class="sidebar-section">
-        <div class="section-title">Datos</div>
-        <div class="chip-wrap">
-          <button id="exportBtn" class="chip">Exportar</button>
-          <button id="importBtn" class="chip">Importar</button>
-          <input id="importFile" type="file" accept="application/json" hidden />
-        </div>
-      </div>
-    </aside>
-
-    <main class="main-area">
-      <section class="hero-surface">
-        <div class="hero-copy">
-          <h2 id="screenTitle" class="screen-title">Biblioteca</h2>
-          <p id="screenSubtitle" class="screen-subtitle">Últimos añadidos primero.</p>
-          <div class="hero-inline">
-            <span id="currentViewPill" class="pill active">Biblioteca</span>
-          </div>
-        </div>
-        <div class="hero-stats">
-          <div class="stats-card">
-            <div class="stats-label">Ítems visibles</div>
-            <div id="countValue" class="stats-value">0</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="collection-surface">
-        <div id="cardsGrid" class="cards-grid"></div>
-        <div id="emptyState" class="empty-state hidden">No hay ítems para mostrar con esta combinación.</div>
-      </section>
-    </main>
+<div id="form" class="overlay hidden">
+  <div class="modal">
+    <input id="t" placeholder="Título">
+    <input id="a" placeholder="Autor">
+    <button id="save">Guardar</button>
   </div>
+</div>
 
-  <button id="fabAdd" class="fab-add" aria-label="Agregar">＋</button>
-
-  <div class="mobile-bar">
-    <button id="mobileViewBtn" class="mobile-control">Biblioteca</button>
-    <button id="mobileSearchBtn" class="mobile-control">Buscar</button>
-    <button id="mobileAddBtn" class="mobile-add">＋</button>
-  </div>
-
-  <div id="formOverlay" class="overlay hidden">
-    <div class="sheet">
-      <div class="sheet-head">
-        <h3 id="formTitle" class="sheet-title">Agregar</h3>
-        <button id="closeFormBtn" class="close-btn">×</button>
-      </div>
-
-      <form id="itemForm" class="form-grid">
-        <input id="editingId" type="hidden" />
-
-        <label class="field">
-          <span class="field-label">Título</span>
-          <input id="title" class="field-input" required />
-        </label>
-
-        <label class="field">
-          <span class="field-label">Subtítulo</span>
-          <input id="subtitle" class="field-input" />
-        </label>
-
-        <label class="field">
-          <span class="field-label">Autor/es</span>
-          <input id="authors" class="field-input" />
-        </label>
-
-        <div class="form-row two-cols">
-          <label class="field">
-            <span class="field-label">Tipo</span>
-            <select id="type" class="field-input">
-              <option value="Libro">Libro</option>
-              <option value="Revista">Revista</option>
-              <option value="Comic">Comic</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </label>
-
-          <label class="field">
-            <span class="field-label">Estado</span>
-            <select id="status" class="field-input">
-              <option value="Biblioteca">Biblioteca</option>
-              <option value="Va y vuelve">Va y vuelve</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="form-row two-cols">
-          <label class="field">
-            <span class="field-label">Editorial</span>
-            <input id="publisher" class="field-input" />
-          </label>
-
-          <label class="field">
-            <span class="field-label">Género</span>
-            <input id="genre" class="field-input" />
-          </label>
-        </div>
-
-        <div class="form-row two-cols">
-          <label class="field">
-            <span class="field-label">Año</span>
-            <input id="year" class="field-input" inputmode="numeric" />
-          </label>
-
-          <label class="field">
-            <span class="field-label">Idioma</span>
-            <input id="language" class="field-input" value="Español" />
-          </label>
-        </div>
-
-        <label class="field">
-          <span class="field-label">Guardián</span>
-          <input id="guardian" class="field-input" placeholder="Se completa por defecto con el último cargado" />
-        </label>
-
-        <label id="loanToField" class="field hidden">
-          <span class="field-label">Prestado a</span>
-          <input id="loanedTo" class="field-input" placeholder="Ej. Clara" />
-        </label>
-
-        <label class="field">
-          <span class="field-label">Notas</span>
-          <textarea id="notes" class="field-input field-textarea"></textarea>
-        </label>
-
-        <div class="upload-box">
-          <div class="field-label">Imagen</div>
-          <input id="imageInput" type="file" accept="image/*" capture="environment" />
-          <div class="meta-text">En celular abre cámara o galería. En desktop abre selector de archivo.</div>
-          <div id="uploadPreview" class="upload-preview hidden">
-            <img id="previewImg" alt="Vista previa" />
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button id="cancelFormBtn2" type="button" class="secondary-btn">Cancelar</button>
-          <button type="submit" class="primary-btn">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="detailOverlay" class="overlay hidden">
-    <div class="sheet">
-      <div class="sheet-head">
-        <h3 class="sheet-title">Ítem</h3>
-        <button id="closeDetailBtn" class="close-btn">×</button>
-      </div>
-
-      <div class="detail-layout">
-        <div>
-          <div id="detailCover" class="detail-cover"></div>
-        </div>
-
-        <div class="detail-body">
-          <div>
-            <h2 id="detailTitle" class="detail-title"></h2>
-            <div id="detailSubtitle" class="detail-subtitle hidden"></div>
-            <p id="detailAuthors" class="detail-authors"></p>
-          </div>
-
-          <div id="detailBadges" class="detail-badges"></div>
-          <div id="detailMeta" class="detail-meta"></div>
-
-          <div class="detail-panel">
-            <h4>Notas</h4>
-            <div id="detailNotes" class="detail-meta"></div>
-          </div>
-
-          <div id="detailLoanBlock" class="detail-panel hidden">
-            <h4>Va y vuelve</h4>
-            <div id="detailLoanCurrent" class="detail-meta"></div>
-            <ul id="detailHistory" class="history-list"></ul>
-          </div>
-
-          <div class="form-actions form-actions-left">
-            <button id="editBtn" type="button" class="secondary-btn">Editar</button>
-            <button id="toggleLoanBtn" type="button" class="secondary-btn">Mover a / desde va y vuelve</button>
-            <button id="deleteBtn" type="button" class="danger-btn">Borrar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
