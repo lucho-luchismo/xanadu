@@ -1,9 +1,11 @@
-Xanadu – paquete corregido
-
-Reemplazá en tu repo:
+Reemplazá estos archivos en la raíz del repo:
 - index.html
+- theme.css
+- app.js
 - sw.js
 - manifest.json
 
-Después hacé commit y forzá recarga del navegador.
-Si venías usando un service worker viejo, cerrá la pestaña y recargá con Ctrl+Shift+R.
+Después hacé commit y recargá fuerte con Ctrl+Shift+R.
+Si seguís viendo caché vieja:
+- DevTools > Application > Service Workers > Unregister
+- Clear storage > Clear site data

@@ -1,10 +1,12 @@
-const CACHE = "xanadu-v4";
+const CACHE = "xanadu-v5";
 
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE).then(cache => cache.addAll([
       "./",
       "./index.html",
+      "./theme.css",
+      "./app.js",
       "./manifest.json"
     ]))
   );
