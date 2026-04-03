@@ -1,679 +1,85 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#b86b2c" />
-  <title>Xanadu</title>
-  <link rel="manifest" href="manifest.json" />
-  <style>
-    :root {
-      --bg: #efe4d2;
-      --paper: #f8efe3;
-      --paper-2: #f3e7d7;
-      --card: #fbf4ea;
-      --ink: #3f2b20;
-      --muted: #7e6858;
-      --line: rgba(126, 95, 71, 0.15);
-      --accent: #b86b2c;
-      --accent-dark: #8f4d1f;
-      --shadow: 0 12px 28px rgba(84, 52, 30, 0.08);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --sidebar: 290px;
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,.22), transparent 30%),
-        linear-gradient(180deg, #f1e5d5 0%, var(--bg) 100%);
-    }
-    button, input, select, textarea { font: inherit; color: inherit; }
-    .app { min-height: 100vh; display: grid; grid-template-columns: var(--sidebar) 1fr; gap: 18px; padding: 18px; }
-    .panel, .sidebar, .modal-card, .mobile-bar {
-      background: linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,.18)), var(--paper);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-    }
-    .sidebar {
-      border-radius: var(--radius-xl);
-      padding: 20px 18px 18px;
-      position: sticky;
-      top: 18px;
-      height: calc(100vh - 36px);
-      overflow: auto;
-      display: flex; flex-direction: column; gap: 18px;
-    }
-    .brand-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:8px; border-bottom:1px solid var(--line); }
-    .brand { margin:0; font-size:2.08rem; line-height:1; letter-spacing:-.03em; }
-    .install-btn, .ghost-btn, .loan-btn, .action-btn {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.42);
-      border-radius: 14px;
-      padding: 10px 14px;
-      cursor: pointer;
-    }
-    .sidebar-block { display:grid; gap:10px; }
-    .block-title { margin:0; color:var(--muted); font-size:.92rem; font-weight:700; }
-    .search {
-      width:100%; border:1px solid var(--line); background:rgba(255,255,255,.5); border-radius:18px; padding:14px 16px; outline:none;
-    }
-    .chip-group { display:flex; flex-wrap:wrap; gap:10px; }
-    .chip {
-      border: 1px solid rgba(126,95,71,.18);
-      background: rgba(255,255,255,.36);
-      border-radius: 16px;
-      padding: 12px 16px;
-      line-height:1; cursor:pointer;
-      transition: .14s ease;
-    }
-    .chip.active {
-      background: linear-gradient(180deg, #cc7b37, var(--accent));
-      color: #fff7ee;
-      border-color: transparent;
-      box-shadow: 0 10px 18px rgba(184,107,44,.22);
-    }
-    .nav-chip { min-width: 150px; text-align:left; }
-    .content { min-width:0; display:grid; gap:18px; }
-    .panel { border-radius: 30px; padding: 20px; }
-    .hero { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; margin-bottom:18px; }
-    .hero h2 { margin:0; font-size:2.3rem; line-height:1; letter-spacing:-.03em; }
-    .hero p { margin:6px 0 0; color:var(--muted); font-size:1.02rem; }
-    .head-actions { display:flex; gap:10px; align-items:center; flex-wrap:wrap; color:var(--muted); }
-    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap:16px; }
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,.52), rgba(255,255,255,.18)), var(--card);
-      border:1px solid var(--line); border-radius:24px; overflow:hidden; box-shadow:0 8px 18px rgba(84,52,30,.05); display:flex; flex-direction:column;
-    }
-    .cover { aspect-ratio:.78; background:linear-gradient(145deg,#ead9c4,#dcc1a3); overflow:hidden; display:grid; place-items:center; }
-    .cover img { width:100%; height:100%; object-fit:cover; display:block; }
-    .placeholder-title { padding:18px; font-size:1.06rem; font-weight:700; text-align:center; color:#755f4b; }
-    .card-body { padding:14px 14px 16px; display:grid; gap:8px; }
-    .title { margin:0; font-size:1.14rem; line-height:1.15; }
-    .subtitle { margin:-4px 0 0; color:var(--muted); font-size:.96rem; }
-    .authors { margin:0; font-size:1rem; line-height:1.24; }
-    .meta, .notes, .history { color:var(--muted); font-size:.94rem; line-height:1.28; }
-    .badge-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    .type-badge, .status-badge, .icon-toggle {
-      border:1px solid var(--line); background:rgba(255,255,255,.55); border-radius:999px; padding:6px 11px; font-size:.88rem; line-height:1;
-    }
-    .type-badge { font-weight:700; }
-    .status-badge.loaned { color: var(--accent-dark); background: rgba(184,107,44,.08); }
-    .icon-toggle { cursor:pointer; background:transparent; }
-    .icon-toggle.active { background: rgba(184,107,44,.11); color:var(--accent-dark); }
-    .card-bottom { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:2px; }
-    .card-actions { display:flex; gap:8px; flex-wrap:wrap; }
-    .loan-btn, .action-btn { padding:8px 10px; border-radius:12px; font-size:.88rem; }
-    .history { border-top:1px dashed var(--line); padding-top:8px; }
-    .empty { display:none; padding:50px 22px; border:1px dashed var(--line); border-radius:22px; text-align:center; color:var(--muted); }
-    .fab {
-      position:fixed; right:26px; bottom:24px; width:72px; height:72px; border:none; border-radius:999px;
-      background:linear-gradient(180deg,#cc7b37,var(--accent)); color:#fff7ee; font-size:2rem; cursor:pointer; box-shadow:0 18px 34px rgba(184,107,44,.28);
-    }
-    .modal { position:fixed; inset:0; background:rgba(51,35,24,.36); display:none; align-items:center; justify-content:center; padding:18px; z-index:30; }
-    .modal.active { display:flex; }
-    .modal-card { width:min(620px, 100%); border-radius:28px; padding:20px; }
-    .modal-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--line); }
-    .modal-head h3 { margin:0; font-size:2rem; }
-    .close-btn { border:none; background:transparent; font-size:1.9rem; cursor:pointer; color:var(--muted); }
-    .form-grid { display:grid; gap:12px; }
-    .row { display:grid; gap:12px; }
-    .row.cols-2 { grid-template-columns:1fr 1fr; }
-    .label { font-size:.9rem; color:var(--muted); font-weight:700; }
-    .input, .select, .textarea {
-      width:100%; border:1px solid var(--line); background:rgba(255,255,255,.5); border-radius:16px; padding:13px 14px; outline:none;
-    }
-    .textarea { min-height:88px; resize:vertical; }
-    .upload { border:1px dashed rgba(126,95,71,.28); border-radius:18px; padding:16px; background:rgba(255,255,255,.24); display:grid; gap:10px; }
-    .upload-preview { width:110px; aspect-ratio:.78; border-radius:14px; overflow:hidden; display:none; background:#e6d0b7; }
-    .upload-preview img { width:100%; height:100%; object-fit:cover; }
-    .modal-actions { display:flex; justify-content:flex-end; gap:10px; }
-    .primary-btn, .secondary-btn { border:none; border-radius:16px; padding:13px 18px; cursor:pointer; }
-    .primary-btn { background:linear-gradient(180deg,#cc7b37,var(--accent)); color:#fff7ee; }
-    .secondary-btn { background:rgba(255,255,255,.4); border:1px solid var(--line); }
-    .mobile-bar {
-      display:none; position:fixed; left:12px; right:12px; bottom:12px; z-index:20; border-radius:22px; padding:10px; gap:8px; grid-template-columns:1fr 1fr auto;
-    }
-    .mobile-btn { border:1px solid var(--line); background:rgba(255,255,255,.44); border-radius:14px; padding:12px 14px; text-align:center; cursor:pointer; }
-    .mobile-add { width:48px; height:48px; border:none; border-radius:999px; background:linear-gradient(180deg,#cc7b37,var(--accent)); color:#fff7ee; font-size:1.7rem; cursor:pointer; }
-    dialog { border:none; border-radius:20px; padding:18px; max-width:360px; width:calc(100% - 24px); background:var(--paper); box-shadow:var(--shadow); }
-    dialog::backdrop { background:rgba(50,34,23,.35); }
-    .dialog-grid { display:grid; gap:12px; }
-    .dialog-actions { display:flex; justify-content:flex-end; gap:8px; }
-    @media (max-width: 980px) {
-      .app { grid-template-columns:1fr; padding:12px; }
-      .sidebar { display:none; }
-      .mobile-bar { display:grid; }
-      .panel { padding:18px 16px 20px; border-radius:24px; }
-      .hero { flex-direction:column; }
-      .grid { grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); }
-      .fab { bottom:84px; right:18px; }
-    }
-    @media (max-width: 620px) {
-      .grid { grid-template-columns:1fr 1fr; }
-      .row.cols-2 { grid-template-columns:1fr; }
-    }
-    @media (max-width: 430px) {
-      .grid { grid-template-columns:1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xanadu</title>
+<style>
+body{margin:0;font-family:Georgia,serif;background:#efe2cf;color:#412d20}
+.app{display:flex}
+.sidebar{width:260px;padding:20px;background:#f6ecdd;height:100vh}
+.main{flex:1;padding:20px}
+.card{background:#fbf4e8;border-radius:16px;padding:12px;margin-bottom:12px;cursor:pointer}
+.badge{font-size:12px;opacity:.7}
+</style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="brand-row">
-        <h1 class="brand">Xanadu</h1>
-        <button class="install-btn" type="button" id="installBtn">Instalar</button>
-      </div>
-      <div class="sidebar-block">
-        <input id="searchInput" class="search" placeholder="🔎  Buscar..." />
-      </div>
-      <div class="sidebar-block">
-        <p class="block-title">Vista</p>
-        <div class="chip-group" id="viewGroup"></div>
-      </div>
-      <div class="sidebar-block">
-        <p class="block-title">Orden</p>
-        <div class="chip-group" id="sortGroup"></div>
-      </div>
-      <div class="sidebar-block">
-        <p class="block-title">Década</p>
-        <div class="chip-group" id="decadeGroup"></div>
-      </div>
-      <div class="sidebar-block">
-        <p class="block-title">Idioma</p>
-        <div class="chip-group" id="languageGroup"></div>
-      </div>
-    </aside>
+<div class="app">
+<div class="sidebar">
+<h2>Xanadu</h2>
+<input placeholder="Buscar..." style="width:100%;margin-bottom:10px">
+<button onclick="setView('Biblioteca')">Biblioteca</button>
+<button onclick="setView('Joyitas')">💎 Joyitas</button>
+<button onclick="setView('Descubrir')">🧭 A descubrir</button>
+<button onclick="setView('Prestados')">↔ Va y vuelve</button>
+</div>
 
-    <main class="content">
-      <section class="panel">
-        <div class="hero">
-          <div>
-            <h2 id="screenTitle">Biblioteca</h2>
-            <p id="screenSubtitle">Últimos añadidos primero.</p>
-          </div>
-          <div class="head-actions">
-            <span id="countLabel">0 ítems</span>
-            <button class="ghost-btn" id="exportBtn" type="button">Exportar</button>
-            <button class="ghost-btn" id="importBtn" type="button">Importar</button>
-            <input id="importFile" type="file" accept="application/json" hidden />
-          </div>
-        </div>
-        <div id="cardsGrid" class="grid"></div>
-        <div id="emptyState" class="empty">No hay ítems para mostrar con esta combinación.</div>
-      </section>
-    </main>
-  </div>
+<div class="main">
+<h1 id="title">Biblioteca</h1>
+<div id="list"></div>
+<button onclick="addItem()">+</button>
+</div>
+</div>
 
-  <button class="fab" id="addBtn" type="button">＋</button>
-  <div class="mobile-bar">
-    <button class="mobile-btn" type="button" id="mobileViewBtn">Biblioteca</button>
-    <button class="mobile-btn" type="button" id="mobileSearchBtn">Buscar</button>
-    <button class="mobile-add" type="button" id="mobileAddBtn">＋</button>
-  </div>
+<script>
+let items = JSON.parse(localStorage.getItem("xanadu")||"[]");
+let view="Biblioteca";
 
-  <div class="modal" id="itemModal">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3 id="modalTitle">Agregar</h3>
-        <button class="close-btn" id="closeModalBtn" type="button">×</button>
-      </div>
-      <form id="itemForm" class="form-grid">
-        <input type="hidden" id="editingId" />
-        <div>
-          <label class="label" for="title">Título</label>
-          <input class="input" id="title" required />
-        </div>
-        <div>
-          <label class="label" for="subtitle">Subtítulo</label>
-          <input class="input" id="subtitle" />
-        </div>
-        <div>
-          <label class="label" for="authors">Autor/es</label>
-          <input class="input" id="authors" />
-        </div>
-        <div class="row cols-2">
-          <div>
-            <label class="label" for="type">Tipo</label>
-            <select class="select" id="type">
-              <option>Libro</option>
-              <option>Revista</option>
-              <option>Comic</option>
-              <option>Otro</option>
-            </select>
-          </div>
-          <div>
-            <label class="label" for="status">Estado principal</label>
-            <select class="select" id="status">
-              <option>Biblioteca</option>
-              <option>Va y vuelve</option>
-            </select>
-          </div>
-        </div>
-        <div class="row cols-2">
-          <div>
-            <label class="label" for="publisher">Editorial</label>
-            <input class="input" id="publisher" />
-          </div>
-          <div>
-            <label class="label" for="genre">Género</label>
-            <input class="input" id="genre" />
-          </div>
-        </div>
-        <div class="row cols-2">
-          <div>
-            <label class="label" for="year">Año</label>
-            <input class="input" id="year" inputmode="numeric" />
-          </div>
-          <div>
-            <label class="label" for="language">Idioma</label>
-            <input class="input" id="language" value="Español" />
-          </div>
-        </div>
-        <div>
-          <label class="label" for="guardian">Guardián</label>
-          <input class="input" id="guardian" placeholder="Se completa con el último cargado" />
-        </div>
-        <div class="row cols-2">
-          <label class="chip" style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input id="isGem" type="checkbox" /> 💎 Joyita</label>
-          <label class="chip" style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input id="toDiscover" type="checkbox" /> 🧭 A descubrir</label>
-        </div>
-        <div>
-          <label class="label" for="notes">Notas</label>
-          <textarea class="textarea" id="notes"></textarea>
-        </div>
-        <div class="upload">
-          <label class="label" for="imageInput">Imagen</label>
-          <input id="imageInput" type="file" accept="image/*" capture="environment" />
-          <div class="upload-preview" id="uploadPreview"><img id="previewImg" alt="Preview" /></div>
-        </div>
-        <div class="modal-actions">
-          <button class="secondary-btn" type="button" id="cancelBtn">Cancelar</button>
-          <button class="primary-btn" type="submit">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
+function save(){localStorage.setItem("xanadu",JSON.stringify(items));}
 
-  <dialog id="loanDialog">
-    <form method="dialog" class="dialog-grid" id="loanForm">
-      <h3 style="margin:0;">Va y vuelve</h3>
-      <div>
-        <label class="label" for="loanPerson">Prestado a</label>
-        <input class="input" id="loanPerson" required />
-      </div>
-      <div>
-        <label class="label" for="loanNote">Nota</label>
-        <input class="input" id="loanNote" />
-      </div>
-      <div class="dialog-actions">
-        <button class="secondary-btn" value="cancel">Cancelar</button>
-        <button class="primary-btn" value="default">Guardar</button>
-      </div>
-    </form>
-  </dialog>
+function render(){
+document.getElementById("title").innerText=view;
+let list=document.getElementById("list");
+list.innerHTML="";
 
-  <script>
-    const DB_NAME = 'xanadu_db_v1';
-    const STORE = 'items';
-    const META = 'meta';
-    const views = ['Biblioteca', 'Joyitas', 'A descubrir', 'Va y vuelve'];
-    const sorts = ['Recientes', 'Año', 'Autor'];
-    const decades = ['Todas', '2020', '2010', '2000', '1990', '1980'];
-    const langs = ['Todos', 'ES', 'EN', 'FR', 'Otros'];
+items.filter(i=>{
+if(view==="Joyitas") return i.gem;
+if(view==="Descubrir") return i.discover;
+if(view==="Prestados") return i.loaned;
+return true;
+}).forEach(i=>{
+let el=document.createElement("div");
+el.className="card";
+el.innerHTML=`
+<strong>${i.title}</strong><br>
+<span class="badge">${i.loanedTo? "Prestado a "+i.loanedTo:""}</span><br>
+<button onclick="toggleGem('${i.id}')">💎</button>
+<button onclick="toggleDiscover('${i.id}')">🧭</button>
+`;
+list.appendChild(el);
+});
+}
 
-    const state = { view:'Biblioteca', sort:'Recientes', decade:'Todas', language:'Todos', search:'' };
-    let db;
-    let books = [];
-    let deferredPrompt = null;
-    let pendingImage = '';
-    let loanTargetId = null;
+function addItem(){
+let t=prompt("Título");
+if(!t)return;
+items.unshift({id:Date.now(),title:t,gem:false,discover:false,loaned:false,loanedTo:"",history:[]});
+save();render();
+}
 
-    const els = {
-      viewGroup: document.getElementById('viewGroup'), sortGroup: document.getElementById('sortGroup'),
-      decadeGroup: document.getElementById('decadeGroup'), languageGroup: document.getElementById('languageGroup'),
-      screenTitle: document.getElementById('screenTitle'), screenSubtitle: document.getElementById('screenSubtitle'),
-      countLabel: document.getElementById('countLabel'), cardsGrid: document.getElementById('cardsGrid'), emptyState: document.getElementById('emptyState'),
-      searchInput: document.getElementById('searchInput'), exportBtn: document.getElementById('exportBtn'), importBtn: document.getElementById('importBtn'), importFile: document.getElementById('importFile'),
-      addBtn: document.getElementById('addBtn'), mobileAddBtn: document.getElementById('mobileAddBtn'), mobileViewBtn: document.getElementById('mobileViewBtn'), mobileSearchBtn: document.getElementById('mobileSearchBtn'),
-      itemModal: document.getElementById('itemModal'), closeModalBtn: document.getElementById('closeModalBtn'), cancelBtn: document.getElementById('cancelBtn'), itemForm: document.getElementById('itemForm'), modalTitle: document.getElementById('modalTitle'),
-      editingId: document.getElementById('editingId'), imageInput: document.getElementById('imageInput'), uploadPreview: document.getElementById('uploadPreview'), previewImg: document.getElementById('previewImg'),
-      installBtn: document.getElementById('installBtn'), loanDialog: document.getElementById('loanDialog'), loanForm: document.getElementById('loanForm'), loanPerson: document.getElementById('loanPerson'), loanNote: document.getElementById('loanNote')
-    };
+function toggleGem(id){
+let i=items.find(x=>x.id==id);
+i.gem=!i.gem;save();render();
+}
 
-    function uid(){ return 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
-    function norm(v){ return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
-    function compact(arr){ return arr.filter(Boolean); }
-    function decadeOf(year){ const n=parseInt(year,10); return n ? String(Math.floor(n/10)*10) : ''; }
-    function languageCode(v){ const x=norm(v); if (x.startsWith('es')) return 'ES'; if (x.startsWith('en') || x.includes('ingles')) return 'EN'; if (x.startsWith('fr') || x.includes('frances')) return 'FR'; return x ? 'Otros' : 'Otros'; }
-    function escapeHtml(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+function toggleDiscover(id){
+let i=items.find(x=>x.id==id);
+i.discover=!i.discover;save();render();
+}
 
-    function openDb(){
-      return new Promise((resolve,reject)=>{
-        const req=indexedDB.open(DB_NAME,1);
-        req.onupgradeneeded=()=>{
-          const db=req.result;
-          if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE,{keyPath:'id'});
-          if(!db.objectStoreNames.contains(META)) db.createObjectStore(META,{keyPath:'key'});
-        };
-        req.onsuccess=()=>resolve(req.result);
-        req.onerror=()=>reject(req.error);
-      });
-    }
-    function tx(storeName, mode='readonly'){ return db.transaction(storeName,mode).objectStore(storeName); }
-    function storePut(storeName, value){ return new Promise((res,rej)=>{ const r=tx(storeName,'readwrite').put(value); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
-    function storeDelete(storeName, key){ return new Promise((res,rej)=>{ const r=tx(storeName,'readwrite').delete(key); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
-    function storeGet(storeName, key){ return new Promise((res,rej)=>{ const r=tx(storeName).get(key); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
-    function storeGetAll(storeName){ return new Promise((res,rej)=>{ const r=tx(storeName).getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=()=>rej(r.error); }); }
+function setView(v){view=v;render();}
 
-    async function seedIfEmpty(){
-      const all = await storeGetAll(STORE);
-      if (all.length) { books = all; return; }
-      const sample = [
-        { id:uid(), title:'Watchmen', subtitle:'', authors:'Alan Moore y Dave Gibbons', type:'Comic', status:'Biblioteca', publisher:'Planeta', genre:'Novela gráfica', year:'2008', language:'Español', guardian:'Luciano', notes:'', image:'', isGem:false, toDiscover:false, loanedTo:'', loanHistory:[], createdAt:Date.now()-10000, updatedAt:Date.now()-10000 },
-        { id:uid(), title:'1984', subtitle:'', authors:'George Orwell', type:'Libro', status:'Biblioteca', publisher:'Debolsillo', genre:'Novela', year:'1984', language:'Español', guardian:'Luciano', notes:'', image:'', isGem:false, toDiscover:false, loanedTo:'', loanHistory:[], createdAt:Date.now()-5000, updatedAt:Date.now()-5000 }
-      ];
-      for (const item of sample) await storePut(STORE, item);
-      await storePut(META, { key:'lastGuardian', value:'Luciano' });
-      books = sample;
-    }
-
-    function renderChipSet(container, items, active, onClick){
-      container.innerHTML = items.map(item => `<button type="button" class="chip ${item===active?'active':''} ${container===els.viewGroup?'nav-chip':''}" data-v="${item}">${item}</button>`).join('');
-      [...container.querySelectorAll('button')].forEach(btn=>btn.addEventListener('click',()=>onClick(btn.dataset.v)));
-    }
-    function renderFilters(){
-      renderChipSet(els.viewGroup, views, state.view, v=>{ state.view=v; render(); });
-      renderChipSet(els.sortGroup, sorts, state.sort, v=>{ state.sort=v; render(); });
-      renderChipSet(els.decadeGroup, decades, state.decade, v=>{ state.decade=v; render(); });
-      renderChipSet(els.languageGroup, langs, state.language, v=>{ state.language=v; render(); });
-      els.mobileViewBtn.textContent = state.view;
-    }
-
-    function filteredBooks(){
-      let list = books.filter(book => {
-        if (state.view === 'Biblioteca') return book.status === 'Biblioteca';
-        if (state.view === 'Va y vuelve') return book.status === 'Va y vuelve';
-        if (state.view === 'Joyitas') return book.isGem;
-        if (state.view === 'A descubrir') return book.toDiscover;
-        return true;
-      });
-      if (state.decade !== 'Todas') list = list.filter(b => decadeOf(b.year) === state.decade);
-      if (state.language !== 'Todos') list = list.filter(b => languageCode(b.language) === state.language);
-      if (state.search) {
-        const q = norm(state.search);
-        list = list.filter(b => norm([b.title,b.subtitle,b.authors,b.publisher,b.genre,b.language,b.guardian,b.notes,b.loanedTo,b.year].join(' ')).includes(q));
-      }
-      list = list.slice();
-      if (state.sort === 'Recientes') list.sort((a,b) => (b.updatedAt||b.createdAt) - (a.updatedAt||a.createdAt));
-      if (state.sort === 'Año') list.sort((a,b)=>Number(b.year||0)-Number(a.year||0));
-      if (state.sort === 'Autor') list.sort((a,b)=>(a.authors||'').localeCompare(b.authors||'','es'));
-      return list;
-    }
-
-    function screenSubtitle(){
-      if (state.view === 'Joyitas') return 'Curaduría manual.';
-      if (state.view === 'A descubrir') return 'Lo que querés tener cerca o buscar más adelante.';
-      if (state.view === 'Va y vuelve') return 'Ítems prestados y con memoria de circulación.';
-      if (state.sort === 'Recientes') return 'Últimos añadidos primero.';
-      if (state.sort === 'Año') return 'Ordenados por año.';
-      return 'Ordenados por autor.';
-    }
-
-    function render(){
-      renderFilters();
-      const list = filteredBooks();
-      els.screenTitle.textContent = state.view;
-      els.screenSubtitle.textContent = screenSubtitle();
-      els.countLabel.textContent = `${list.length} ítem${list.length===1?'':'s'}`;
-      els.cardsGrid.innerHTML = list.map(book => {
-        const latest = book.loanHistory && book.loanHistory.length ? book.loanHistory[0] : null;
-        const cover = book.image ? `<img src="${book.image}" alt="${escapeHtml(book.title)}">` : `<div class="placeholder-title">${escapeHtml(book.title)}</div>`;
-        const loanBadge = book.status === 'Va y vuelve' ? `Prestado${book.loanedTo ? ` a ${escapeHtml(book.loanedTo)}` : ''}` : escapeHtml(book.status);
-        const history = latest ? `<div class="history">Último movimiento: ${latest.action}${latest.person ? ` · ${escapeHtml(latest.person)}` : ''}${latest.note ? ` · ${escapeHtml(latest.note)}` : ''}</div>` : '';
-        return `<article class="card">
-          <div class="cover">${cover}</div>
-          <div class="card-body">
-            <h3 class="title">${escapeHtml(book.title)}</h3>
-            ${book.subtitle ? `<p class="subtitle">${escapeHtml(book.subtitle)}</p>` : ''}
-            <p class="authors">${escapeHtml(book.authors||'')}</p>
-            <div class="badge-row"><span class="type-badge">${escapeHtml(book.type)}</span></div>
-            <div class="meta">${compact([book.publisher, book.year]).join(' · ')}</div>
-            <div class="meta">${compact([book.language, book.guardian ? `Guardián: ${book.guardian}` : '']).join(' · ')}</div>
-            ${book.notes ? `<div class="notes">${escapeHtml(book.notes)}</div>` : ''}
-            ${history}
-            <div class="card-bottom">
-              <div class="card-actions">
-                <button type="button" class="icon-toggle ${book.isGem?'active':''}" data-action="gem" data-id="${book.id}">💎</button>
-                <button type="button" class="icon-toggle ${book.toDiscover?'active':''}" data-action="discover" data-id="${book.id}">🧭</button>
-              </div>
-              <div class="status-badge ${book.status==='Va y vuelve'?'loaned':''}">${loanBadge}</div>
-            </div>
-            <div class="card-actions">
-              <button type="button" class="action-btn" data-action="edit" data-id="${book.id}">Editar</button>
-              ${book.status === 'Va y vuelve'
-                ? `<button type="button" class="loan-btn" data-action="return" data-id="${book.id}">Marcar regreso</button>`
-                : `<button type="button" class="loan-btn" data-action="loan" data-id="${book.id}">Prestar</button>`}
-            </div>
-          </div>
-        </article>`;
-      }).join('');
-      els.emptyState.style.display = list.length ? 'none' : 'block';
-      bindCardEvents();
-    }
-
-    function bindCardEvents(){
-      [...document.querySelectorAll('[data-action]')].forEach(btn => {
-        btn.addEventListener('click', async () => {
-          const id = btn.dataset.id;
-          const book = books.find(b => b.id === id);
-          if (!book) return;
-          const action = btn.dataset.action;
-          if (action === 'gem') {
-            if (!book.isGem && books.filter(x => x.isGem).length >= 12) { alert('Joyitas tiene un límite blando de 12.'); return; }
-            book.isGem = !book.isGem; book.updatedAt = Date.now(); await persistBook(book); render();
-          }
-          if (action === 'discover') { book.toDiscover = !book.toDiscover; book.updatedAt = Date.now(); await persistBook(book); render(); }
-          if (action === 'edit') openItemModal(book);
-          if (action === 'loan') { loanTargetId = id; els.loanPerson.value = book.loanedTo || ''; els.loanNote.value = ''; els.loanDialog.showModal(); }
-          if (action === 'return') {
-            book.status = 'Biblioteca';
-            book.loanHistory = [{ date: new Date().toISOString(), action: 'Regresó', person: book.loanedTo || '', note: '' }, ...(book.loanHistory || [])];
-            book.loanedTo = '';
-            book.updatedAt = Date.now();
-            await persistBook(book);
-            render();
-          }
-        });
-      });
-    }
-
-    async function persistBook(book){ books = books.map(b => b.id === book.id ? book : b); await storePut(STORE, book); }
-
-    function openItemModal(book=null){
-      els.itemModal.classList.add('active');
-      els.itemForm.reset();
-      pendingImage = '';
-      els.uploadPreview.style.display = 'none';
-      document.getElementById('language').value = 'Español';
-      document.getElementById('guardian').value = '';
-      document.getElementById('status').value = 'Biblioteca';
-      document.getElementById('isGem').checked = false;
-      document.getElementById('toDiscover').checked = false;
-      els.modalTitle.textContent = book ? 'Editar' : 'Agregar';
-      els.editingId.value = '';
-      if (!book) {
-        storeGet(META, 'lastGuardian').then(meta => { document.getElementById('guardian').value = meta?.value || ''; });
-        return;
-      }
-      els.editingId.value = book.id;
-      document.getElementById('title').value = book.title || '';
-      document.getElementById('subtitle').value = book.subtitle || '';
-      document.getElementById('authors').value = book.authors || '';
-      document.getElementById('type').value = book.type || 'Libro';
-      document.getElementById('status').value = book.status || 'Biblioteca';
-      document.getElementById('publisher').value = book.publisher || '';
-      document.getElementById('genre').value = book.genre || '';
-      document.getElementById('year').value = book.year || '';
-      document.getElementById('language').value = book.language || 'Español';
-      document.getElementById('guardian').value = book.guardian || '';
-      document.getElementById('notes').value = book.notes || '';
-      document.getElementById('isGem').checked = !!book.isGem;
-      document.getElementById('toDiscover').checked = !!book.toDiscover;
-      if (book.image) {
-        pendingImage = book.image;
-        els.previewImg.src = book.image;
-        els.uploadPreview.style.display = 'block';
-      }
-    }
-    function closeItemModal(){ els.itemModal.classList.remove('active'); }
-
-    async function fileToDataURL(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(file); }); }
-    async function compressImage(file){
-      const dataUrl = await fileToDataURL(file);
-      const img = new Image();
-      await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=dataUrl; });
-      const maxW = 700;
-      const scale = Math.min(1, maxW / img.width);
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.round(img.width * scale);
-      canvas.height = Math.round(img.height * scale);
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      return canvas.toDataURL('image/jpeg', 0.72);
-    }
-
-    els.imageInput.addEventListener('change', async e => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      pendingImage = await compressImage(file);
-      els.previewImg.src = pendingImage;
-      els.uploadPreview.style.display = 'block';
-    });
-
-    els.itemForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const id = els.editingId.value || uid();
-      const original = books.find(b => b.id === id);
-      const guardian = document.getElementById('guardian').value.trim();
-      const book = {
-        id,
-        title: document.getElementById('title').value.trim(),
-        subtitle: document.getElementById('subtitle').value.trim(),
-        authors: document.getElementById('authors').value.trim(),
-        type: document.getElementById('type').value,
-        status: document.getElementById('status').value,
-        publisher: document.getElementById('publisher').value.trim(),
-        genre: document.getElementById('genre').value.trim(),
-        year: document.getElementById('year').value.trim(),
-        language: document.getElementById('language').value.trim() || 'Español',
-        guardian: guardian || (await storeGet(META, 'lastGuardian'))?.value || '',
-        notes: document.getElementById('notes').value.trim(),
-        image: pendingImage || original?.image || '',
-        isGem: document.getElementById('isGem').checked,
-        toDiscover: document.getElementById('toDiscover').checked,
-        loanedTo: original?.loanedTo || '',
-        loanHistory: original?.loanHistory || [],
-        createdAt: original?.createdAt || Date.now(),
-        updatedAt: Date.now()
-      };
-      if (!book.title) return;
-      if (book.guardian) await storePut(META, { key:'lastGuardian', value: book.guardian });
-      if (original) books = books.map(b => b.id === id ? book : b); else books.unshift(book);
-      await storePut(STORE, book);
-      closeItemModal();
-      state.view = book.status === 'Va y vuelve' ? 'Va y vuelve' : state.view;
-      render();
-    });
-
-    els.loanForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const book = books.find(b => b.id === loanTargetId);
-      if (!book) return;
-      const person = els.loanPerson.value.trim();
-      const note = els.loanNote.value.trim();
-      book.status = 'Va y vuelve';
-      book.loanedTo = person;
-      book.loanHistory = [{ date: new Date().toISOString(), action: 'Prestado', person, note }, ...(book.loanHistory || [])];
-      book.updatedAt = Date.now();
-      await persistBook(book);
-      els.loanDialog.close();
-      state.view = 'Va y vuelve';
-      render();
-    });
-
-    els.searchInput.addEventListener('input', e => { state.search = e.target.value; render(); });
-    els.addBtn.addEventListener('click', () => openItemModal());
-    els.mobileAddBtn.addEventListener('click', () => openItemModal());
-    els.closeModalBtn.addEventListener('click', closeItemModal);
-    els.cancelBtn.addEventListener('click', closeItemModal);
-    els.mobileSearchBtn.addEventListener('click', () => els.searchInput.focus());
-    els.mobileViewBtn.addEventListener('click', () => {
-      const idx = views.indexOf(state.view);
-      state.view = views[(idx + 1) % views.length];
-      render();
-    });
-
-    els.exportBtn.addEventListener('click', () => {
-      const payload = { app:'Xanadu', version:1, exportedAt:new Date().toISOString(), books };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `xanadu-export-${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
-    els.importBtn.addEventListener('click', () => els.importFile.click());
-    els.importFile.addEventListener('change', async e => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      try {
-        const text = await file.text();
-        const parsed = JSON.parse(text);
-        const imported = Array.isArray(parsed) ? parsed : parsed.books;
-        if (!Array.isArray(imported)) throw new Error('Formato inválido');
-        if (!confirm('Esto va a reemplazar la biblioteca local de este navegador.')) return;
-        const current = await storeGetAll(STORE);
-        for (const item of current) await storeDelete(STORE, item.id);
-        books = imported.map(item => ({
-          id: item.id || uid(), title: item.title || '', subtitle: item.subtitle || '', authors: item.authors || '', type: item.type || 'Libro', status: item.status || 'Biblioteca', publisher: item.publisher || '', genre: item.genre || '', year: item.year || '', language: item.language || 'Español', guardian: item.guardian || '', notes: item.notes || '', image: item.image || '', isGem: !!item.isGem, toDiscover: !!item.toDiscover, loanedTo: item.loanedTo || '', loanHistory: Array.isArray(item.loanHistory) ? item.loanHistory : [], createdAt: item.createdAt || Date.now(), updatedAt: item.updatedAt || Date.now()
-        }));
-        for (const item of books) await storePut(STORE, item);
-        const guardian = books.map(b => b.guardian).filter(Boolean).at(-1);
-        if (guardian) await storePut(META, { key:'lastGuardian', value: guardian });
-        render();
-      } catch(err) { alert('No se pudo importar el JSON.'); console.error(err); }
-      e.target.value='';
-    });
-
-    window.addEventListener('beforeinstallprompt', e => {
-      e.preventDefault();
-      deferredPrompt = e;
-      els.installBtn.style.display = 'inline-block';
-    });
-    els.installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) { alert('La opción de instalar aparece cuando el navegador la habilita.'); return; }
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-    });
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
-    }
-
-    (async function init(){
-      db = await openDb();
-      await seedIfEmpty();
-      books = await storeGetAll(STORE);
-      render();
-    })();
-  </script>
+render();
+</script>
 </body>
 </html>

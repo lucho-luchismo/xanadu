@@ -1,17 +1,8 @@
 {
-  "name": "Xanadu",
-  "short_name": "Xanadu",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#efe4d2",
-  "theme_color": "#b86b2c",
-  "description": "Biblioteca offline-first para uso personal.",
-  "icons": [
-    {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%23efe4d2'/%3E%3Cpath d='M46 52h100v88H46z' fill='%23b86b2c'/%3E%3Cpath d='M58 64h20v64H58zm28 0h18v64H86zm26 0h22v64h-22z' fill='%23fff7ee'/%3E%3C/svg%3E",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
-  ]
+"name": "Xanadu",
+"short_name": "Xanadu",
+"start_url": ".",
+"display": "standalone",
+"background_color": "#efe2cf",
+"theme_color": "#efe2cf"
 }
