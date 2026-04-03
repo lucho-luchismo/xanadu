@@ -1,4 +1,4 @@
-const CACHE = "xanadu-v3";
+const CACHE = "xanadu-v4";
 
 self.addEventListener("install", event => {
   event.waitUntil(
@@ -13,9 +13,7 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))
-    )
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
   );
   self.clients.claim();
 });
