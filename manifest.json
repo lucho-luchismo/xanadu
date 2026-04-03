@@ -1,8 +1,10 @@
 {
-"name": "Xanadu",
-"short_name": "Xanadu",
-"start_url": ".",
-"display": "standalone",
-"background_color": "#efe2cf",
-"theme_color": "#efe2cf"
+  "name": "Xanadu",
+  "short_name": "Xanadu",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#efe1ce",
+  "theme_color": "#ecdcca",
+  "description": "Biblioteca local y offline.",
+  "icons": []
 }

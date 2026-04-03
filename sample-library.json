@@ -1,33 +1,11 @@
 {
-  "app": "Xanadu",
-  "version": 1,
   "books": [
     {
-      "id": "demo-1984",
-      "title": "1984",
-      "subtitle": "",
-      "authors": "George Orwell",
-      "type": "Libro",
-      "status": "Biblioteca",
-      "publisher": "Debolsillo",
-      "genre": "Novela",
-      "year": "1984",
-      "language": "Español",
-      "guardian": "Luciano",
-      "notes": "",
-      "image": "",
-      "isGem": true,
-      "toDiscover": false,
-      "loanedTo": "",
-      "loanHistory": []
-    },
-    {
-      "id": "demo-watchmen",
       "title": "Watchmen",
       "subtitle": "",
       "authors": "Alan Moore y Dave Gibbons",
       "type": "Comic",
-      "status": "Va y vuelve",
+      "status": "Biblioteca",
       "publisher": "Planeta",
       "genre": "Novela gráfica",
       "year": "2008",
@@ -35,11 +13,32 @@
       "guardian": "Luciano",
       "notes": "",
       "image": "",
+      "isGem": true,
+      "discover": false,
+      "loanedTo": "",
+      "loanHistory": []
+    },
+    {
+      "title": "1984",
+      "subtitle": "",
+      "authors": "George Orwell",
+      "type": "Libro",
+      "status": "Va y vuelve",
+      "publisher": "Debolsillo",
+      "genre": "Novela",
+      "year": "1984",
+      "language": "Español",
+      "guardian": "Luciano",
+      "notes": "",
+      "image": "",
       "isGem": false,
-      "toDiscover": true,
-      "loanedTo": "Juan",
+      "discover": true,
+      "loanedTo": "Clara",
       "loanHistory": [
-        {"date": "2026-04-03T12:00:00.000Z", "action": "Prestado", "person": "Juan", "note": "Se lo lleva una semana"}
+        {
+          "to": "Clara",
+          "date": 1712102400000
+        }
       ]
     }
   ]
