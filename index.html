@@ -3,1608 +3,677 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#b46d2c" />
+  <meta name="theme-color" content="#b86b2c" />
   <title>Xanadu</title>
   <link rel="manifest" href="manifest.json" />
   <style>
-    :root{
-      --bg:#ece0cf;
-      --paper:#f4eadb;
-      --paper-2:#efe1cf;
-      --ink:#3a281a;
-      --muted:#7a6655;
-      --line:#d7c1a6;
-      --accent:#a25d20;
-      --accent-2:#c98b52;
-      --soft:#f8f1e6;
-      --danger:#9b4436;
-      --shadow:0 10px 30px rgba(58,40,26,.08);
-      --radius:18px;
-      --gap:14px;
+    :root {
+      --bg: #efe4d2;
+      --paper: #f8efe3;
+      --paper-2: #f3e7d7;
+      --card: #fbf4ea;
+      --ink: #3f2b20;
+      --muted: #7e6858;
+      --line: rgba(126, 95, 71, 0.15);
+      --accent: #b86b2c;
+      --accent-dark: #8f4d1f;
+      --shadow: 0 12px 28px rgba(84, 52, 30, 0.08);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --sidebar: 290px;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, serif;
-      color:var(--ink);
-      background:linear-gradient(180deg,#efe4d4 0%, var(--bg) 100%);
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.22), transparent 30%),
+        linear-gradient(180deg, #f1e5d5 0%, var(--bg) 100%);
     }
-    button,input,select,textarea{font:inherit}
-    .app{
-      max-width:1400px;
-      margin:0 auto;
-      min-height:100vh;
-      display:grid;
-      grid-template-columns:290px 1fr;
-      gap:18px;
-      padding:18px;
+    button, input, select, textarea { font: inherit; color: inherit; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: var(--sidebar) 1fr; gap: 18px; padding: 18px; }
+    .panel, .sidebar, .modal-card, .mobile-bar {
+      background: linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,.18)), var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
     }
-    .panel{
-      background:rgba(244,234,219,.92);
-      border:1px solid var(--line);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(8px);
+    .sidebar {
+      border-radius: var(--radius-xl);
+      padding: 20px 18px 18px;
+      position: sticky;
+      top: 18px;
+      height: calc(100vh - 36px);
+      overflow: auto;
+      display: flex; flex-direction: column; gap: 18px;
     }
-    .sidebar{
-      padding:18px;
-      position:sticky;
-      top:18px;
-      height:calc(100vh - 36px);
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-      overflow:auto;
+    .brand-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:8px; border-bottom:1px solid var(--line); }
+    .brand { margin:0; font-size:2.08rem; line-height:1; letter-spacing:-.03em; }
+    .install-btn, .ghost-btn, .loan-btn, .action-btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.42);
+      border-radius: 14px;
+      padding: 10px 14px;
+      cursor: pointer;
     }
-    .brand{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding-bottom:8px;
-      border-bottom:1px solid rgba(167,128,86,.25);
+    .sidebar-block { display:grid; gap:10px; }
+    .block-title { margin:0; color:var(--muted); font-size:.92rem; font-weight:700; }
+    .search {
+      width:100%; border:1px solid var(--line); background:rgba(255,255,255,.5); border-radius:18px; padding:14px 16px; outline:none;
     }
-    .brand h1{
-      margin:0;
-      font-size:2rem;
-      letter-spacing:-.03em;
-      font-weight:700;
+    .chip-group { display:flex; flex-wrap:wrap; gap:10px; }
+    .chip {
+      border: 1px solid rgba(126,95,71,.18);
+      background: rgba(255,255,255,.36);
+      border-radius: 16px;
+      padding: 12px 16px;
+      line-height:1; cursor:pointer;
+      transition: .14s ease;
     }
-    .search{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:12px 14px;
-      border:1px solid var(--line);
-      border-radius:14px;
-      background:var(--soft);
+    .chip.active {
+      background: linear-gradient(180deg, #cc7b37, var(--accent));
+      color: #fff7ee;
+      border-color: transparent;
+      box-shadow: 0 10px 18px rgba(184,107,44,.22);
     }
-    .search input{
-      width:100%;
-      background:transparent;
-      border:0;
-      outline:0;
-      color:var(--ink);
-      font-size:1rem;
+    .nav-chip { min-width: 150px; text-align:left; }
+    .content { min-width:0; display:grid; gap:18px; }
+    .panel { border-radius: 30px; padding: 20px; }
+    .hero { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; margin-bottom:18px; }
+    .hero h2 { margin:0; font-size:2.3rem; line-height:1; letter-spacing:-.03em; }
+    .hero p { margin:6px 0 0; color:var(--muted); font-size:1.02rem; }
+    .head-actions { display:flex; gap:10px; align-items:center; flex-wrap:wrap; color:var(--muted); }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap:16px; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.52), rgba(255,255,255,.18)), var(--card);
+      border:1px solid var(--line); border-radius:24px; overflow:hidden; box-shadow:0 8px 18px rgba(84,52,30,.05); display:flex; flex-direction:column;
     }
-    .section-title{
-      margin:0 0 10px;
-      font-size:1rem;
-      color:var(--muted);
-      font-weight:700;
+    .cover { aspect-ratio:.78; background:linear-gradient(145deg,#ead9c4,#dcc1a3); overflow:hidden; display:grid; place-items:center; }
+    .cover img { width:100%; height:100%; object-fit:cover; display:block; }
+    .placeholder-title { padding:18px; font-size:1.06rem; font-weight:700; text-align:center; color:#755f4b; }
+    .card-body { padding:14px 14px 16px; display:grid; gap:8px; }
+    .title { margin:0; font-size:1.14rem; line-height:1.15; }
+    .subtitle { margin:-4px 0 0; color:var(--muted); font-size:.96rem; }
+    .authors { margin:0; font-size:1rem; line-height:1.24; }
+    .meta, .notes, .history { color:var(--muted); font-size:.94rem; line-height:1.28; }
+    .badge-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .type-badge, .status-badge, .icon-toggle {
+      border:1px solid var(--line); background:rgba(255,255,255,.55); border-radius:999px; padding:6px 11px; font-size:.88rem; line-height:1;
     }
-    .stack{display:grid; gap:10px}
-    .chips{display:flex; flex-wrap:wrap; gap:8px}
-    .chip,.view-tab,.sort-tab,.btn{
-      border:1px solid var(--line);
-      background:var(--soft);
-      color:var(--ink);
-      border-radius:12px;
-      padding:10px 12px;
-      cursor:pointer;
-      transition:.15s ease;
-      text-decoration:none;
+    .type-badge { font-weight:700; }
+    .status-badge.loaned { color: var(--accent-dark); background: rgba(184,107,44,.08); }
+    .icon-toggle { cursor:pointer; background:transparent; }
+    .icon-toggle.active { background: rgba(184,107,44,.11); color:var(--accent-dark); }
+    .card-bottom { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:2px; }
+    .card-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .loan-btn, .action-btn { padding:8px 10px; border-radius:12px; font-size:.88rem; }
+    .history { border-top:1px dashed var(--line); padding-top:8px; }
+    .empty { display:none; padding:50px 22px; border:1px dashed var(--line); border-radius:22px; text-align:center; color:var(--muted); }
+    .fab {
+      position:fixed; right:26px; bottom:24px; width:72px; height:72px; border:none; border-radius:999px;
+      background:linear-gradient(180deg,#cc7b37,var(--accent)); color:#fff7ee; font-size:2rem; cursor:pointer; box-shadow:0 18px 34px rgba(184,107,44,.28);
     }
-    .chip:hover,.view-tab:hover,.sort-tab:hover,.btn:hover{
-      transform:translateY(-1px);
-      border-color:#c8a77d;
+    .modal { position:fixed; inset:0; background:rgba(51,35,24,.36); display:none; align-items:center; justify-content:center; padding:18px; z-index:30; }
+    .modal.active { display:flex; }
+    .modal-card { width:min(620px, 100%); border-radius:28px; padding:20px; }
+    .modal-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--line); }
+    .modal-head h3 { margin:0; font-size:2rem; }
+    .close-btn { border:none; background:transparent; font-size:1.9rem; cursor:pointer; color:var(--muted); }
+    .form-grid { display:grid; gap:12px; }
+    .row { display:grid; gap:12px; }
+    .row.cols-2 { grid-template-columns:1fr 1fr; }
+    .label { font-size:.9rem; color:var(--muted); font-weight:700; }
+    .input, .select, .textarea {
+      width:100%; border:1px solid var(--line); background:rgba(255,255,255,.5); border-radius:16px; padding:13px 14px; outline:none;
     }
-    .chip.active,.view-tab.active,.sort-tab.active{
-      background:linear-gradient(180deg,#c8813f,#ae6727);
-      color:#fff8ef;
-      border-color:#9f5c21;
-      box-shadow:0 8px 18px rgba(162,93,32,.18);
+    .textarea { min-height:88px; resize:vertical; }
+    .upload { border:1px dashed rgba(126,95,71,.28); border-radius:18px; padding:16px; background:rgba(255,255,255,.24); display:grid; gap:10px; }
+    .upload-preview { width:110px; aspect-ratio:.78; border-radius:14px; overflow:hidden; display:none; background:#e6d0b7; }
+    .upload-preview img { width:100%; height:100%; object-fit:cover; }
+    .modal-actions { display:flex; justify-content:flex-end; gap:10px; }
+    .primary-btn, .secondary-btn { border:none; border-radius:16px; padding:13px 18px; cursor:pointer; }
+    .primary-btn { background:linear-gradient(180deg,#cc7b37,var(--accent)); color:#fff7ee; }
+    .secondary-btn { background:rgba(255,255,255,.4); border:1px solid var(--line); }
+    .mobile-bar {
+      display:none; position:fixed; left:12px; right:12px; bottom:12px; z-index:20; border-radius:22px; padding:10px; gap:8px; grid-template-columns:1fr 1fr auto;
     }
-    .chip.small{padding:8px 10px; font-size:.92rem}
-    .sidebar-footer{
-      margin-top:auto;
-      display:grid;
-      gap:10px;
-      padding-top:12px;
-      border-top:1px solid rgba(167,128,86,.25);
+    .mobile-btn { border:1px solid var(--line); background:rgba(255,255,255,.44); border-radius:14px; padding:12px 14px; text-align:center; cursor:pointer; }
+    .mobile-add { width:48px; height:48px; border:none; border-radius:999px; background:linear-gradient(180deg,#cc7b37,var(--accent)); color:#fff7ee; font-size:1.7rem; cursor:pointer; }
+    dialog { border:none; border-radius:20px; padding:18px; max-width:360px; width:calc(100% - 24px); background:var(--paper); box-shadow:var(--shadow); }
+    dialog::backdrop { background:rgba(50,34,23,.35); }
+    .dialog-grid { display:grid; gap:12px; }
+    .dialog-actions { display:flex; justify-content:flex-end; gap:8px; }
+    @media (max-width: 980px) {
+      .app { grid-template-columns:1fr; padding:12px; }
+      .sidebar { display:none; }
+      .mobile-bar { display:grid; }
+      .panel { padding:18px 16px 20px; border-radius:24px; }
+      .hero { flex-direction:column; }
+      .grid { grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); }
+      .fab { bottom:84px; right:18px; }
     }
-    .main{
-      display:grid;
-      gap:16px;
-      min-width:0;
+    @media (max-width: 620px) {
+      .grid { grid-template-columns:1fr 1fr; }
+      .row.cols-2 { grid-template-columns:1fr; }
     }
-    .topbar{
-      padding:18px;
-      display:grid;
-      gap:14px;
-    }
-    .topbar-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-    }
-    .topbar-row .label{
-      font-size:.95rem;
-      color:var(--muted);
-      font-weight:700;
-      margin-right:2px;
-    }
-    .view-tab{
-      padding:12px 16px;
-      border-radius:14px;
-      font-size:1rem;
-    }
-    .view-tab .emoji{margin-right:6px}
-    .sort-tab{padding:9px 14px}
-    .content{
-      background:rgba(244,234,219,.92);
-      border:1px solid var(--line);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      min-height:420px;
-      overflow:hidden;
-    }
-    .collection-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:18px 20px 0;
-    }
-    .collection-head h2{
-      margin:0;
-      font-size:1.6rem;
-      letter-spacing:-.03em;
-    }
-    .collection-head p{
-      margin:4px 0 0;
-      color:var(--muted);
-      font-size:.98rem;
-    }
-    .cards{
-      padding:18px;
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
-      gap:14px;
-    }
-    .card{
-      background:linear-gradient(180deg,#f7f0e5,#f1e4d3);
-      border:1px solid #dbc5aa;
-      border-radius:18px;
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      min-width:0;
-      box-shadow:0 6px 18px rgba(58,40,26,.05);
-    }
-    .cover{
-      aspect-ratio:4 / 5;
-      background:linear-gradient(145deg,#e5d3bd,#ccb294);
-      display:grid;
-      place-items:center;
-      overflow:hidden;
-      border-bottom:1px solid #dcc4a5;
-    }
-    .cover img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
-    .cover-placeholder{
-      padding:18px;
-      text-align:center;
-      color:#6f5845;
-      font-weight:700;
-      line-height:1.2;
-    }
-    .card-body{
-      padding:12px 12px 10px;
-      display:grid;
-      gap:7px;
-      min-width:0;
-      flex:1;
-    }
-    .title{
-      margin:0;
-      font-size:1.05rem;
-      line-height:1.15;
-      word-break:break-word;
-    }
-    .subtitle{
-      margin:0;
-      color:#5f4b3b;
-      font-size:.95rem;
-      line-height:1.2;
-    }
-    .authors{
-      color:#503d2f;
-      font-size:.98rem;
-      line-height:1.25;
-    }
-    .type-pill,.status-pill,.guardian-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      width:fit-content;
-      border-radius:999px;
-      padding:5px 10px;
-      font-size:.8rem;
-      font-weight:700;
-      border:1px solid #d6b996;
-      background:#faefe0;
-    }
-    .status-pill{ background:#fff7eb; }
-    .guardian-pill{
-      background:#f3e5d3;
-      color:#6d533f;
-      border-color:#dcc4a7;
-      max-width:100%;
-    }
-    .guardian-pill span{
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      display:block;
-    }
-    .meta{
-      color:var(--muted);
-      font-size:.92rem;
-      line-height:1.3;
-      min-height:1.2em;
-    }
-    .card-bottom{
-      margin-top:auto;
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap:8px;
-      padding-top:4px;
-    }
-    .left-bottom{
-      display:grid;
-      gap:6px;
-      min-width:0;
-    }
-    .gem-btn{
-      background:transparent;
-      border:0;
-      color:#9d6c3f;
-      cursor:pointer;
-      font-size:1.2rem;
-      padding:6px;
-      border-radius:999px;
-    }
-    .gem-btn:hover{background:rgba(157,108,63,.08)}
-    .gem-btn.active{color:#b25e1e}
-    .empty{
-      padding:48px 22px 56px;
-      text-align:center;
-      color:var(--muted);
-      font-size:1.05rem;
-    }
-    .fab{
-      position:fixed;
-      right:24px;
-      bottom:24px;
-      width:68px;
-      height:68px;
-      border-radius:999px;
-      border:0;
-      background:linear-gradient(180deg,#bd7634,#9e581d);
-      color:#fff8ef;
-      font-size:2rem;
-      box-shadow:0 14px 30px rgba(162,93,32,.32);
-      cursor:pointer;
-      z-index:50;
-    }
-    .fab:hover{transform:translateY(-2px)}
-    .mobile-bottom{
-      display:none;
-      position:fixed;
-      left:0; right:0; bottom:0;
-      padding:10px 12px calc(10px + env(safe-area-inset-bottom));
-      background:rgba(244,234,219,.97);
-      border-top:1px solid var(--line);
-      box-shadow:0 -8px 22px rgba(58,40,26,.08);
-      z-index:40;
-      gap:8px;
-    }
-    .mobile-bottom .btn{
-      flex:1;
-      text-align:center;
-      padding:11px 10px;
-    }
-    .mobile-bottom .btn.active{
-      background:linear-gradient(180deg,#c8813f,#ae6727);
-      color:#fff8ef;
-      border-color:#9f5c21;
-    }
-    .mobile-search{
-      display:none;
-      padding:0 18px 18px;
-    }
-    .mobile-search .search{background:#f8f1e6}
-    .modal{
-      position:fixed; inset:0;
-      background:rgba(35,25,15,.42);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      z-index:70;
-    }
-    .modal.active{display:flex}
-    .modal-box{
-      width:min(720px,100%);
-      max-height:90vh;
-      overflow:auto;
-      background:linear-gradient(180deg,#f7eddf,#f2e5d4);
-      border:1px solid var(--line);
-      border-radius:24px;
-      box-shadow:0 20px 50px rgba(0,0,0,.18);
-    }
-    .modal-head{
-      position:sticky; top:0;
-      background:linear-gradient(180deg,#f7eddf,#f1e3cf);
-      border-bottom:1px solid var(--line);
-      padding:16px 18px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      z-index:2;
-    }
-    .modal-head h3{margin:0; font-size:1.5rem}
-    .modal-body{padding:18px; display:grid; gap:14px}
-    .field{display:grid; gap:7px}
-    .field label{font-size:.92rem; color:var(--muted); font-weight:700}
-    .field input,.field textarea,.field select{
-      width:100%;
-      border:1px solid var(--line);
-      border-radius:13px;
-      padding:12px 13px;
-      background:#fff9f2;
-      color:var(--ink);
-      outline:none;
-    }
-    .field textarea{min-height:82px; resize:vertical}
-    .field input:focus,.field textarea:focus,.field select:focus{
-      border-color:#c78a51;
-      box-shadow:0 0 0 4px rgba(201,139,82,.14);
-    }
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-    .modal-actions{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-      padding:0 18px 18px;
-    }
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      font-size:.98rem;
-    }
-    .btn-primary{
-      background:linear-gradient(180deg,#c6803d,#a55f23);
-      color:#fff8ef;
-      border-color:#9f5c21;
-    }
-    .btn-danger{color:#8c3c31}
-    .cover-preview{
-      display:grid;
-      grid-template-columns:110px 1fr;
-      gap:12px;
-      align-items:center;
-      padding:10px;
-      border:1px dashed #cfb08d;
-      border-radius:16px;
-      background:#fbf3e8;
-    }
-    .cover-thumb{
-      aspect-ratio:4/5;
-      border-radius:12px;
-      overflow:hidden;
-      background:#dfc6ab;
-      display:grid;
-      place-items:center;
-      color:#6f5845;
-      font-size:.85rem;
-      text-align:center;
-    }
-    .cover-thumb img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
-    .note{
-      color:var(--muted);
-      font-size:.9rem;
-      line-height:1.35;
-    }
-    .utility-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-    }
-    .utility-row .muted{
-      color:var(--muted);
-      font-size:.92rem;
-    }
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom:94px;
-      transform:translateX(-50%);
-      background:#4e3929;
-      color:#fff9f2;
-      border-radius:14px;
-      padding:12px 14px;
-      box-shadow:0 16px 28px rgba(0,0,0,.18);
-      opacity:0;
-      pointer-events:none;
-      transition:.2s ease;
-      z-index:100;
-      max-width:min(92vw,520px);
-      text-align:center;
-    }
-    .toast.show{opacity:1}
-    @media (max-width:980px){
-      .app{grid-template-columns:1fr; padding:14px 14px 94px}
-      .sidebar{display:none}
-      .mobile-bottom{display:flex}
-      .mobile-search{display:block}
-      .topbar{padding:16px}
-      .collection-head{padding:16px 18px 0}
-      .fab{bottom:86px; width:62px; height:62px}
-    }
-    @media (max-width:720px){
-      .cards{grid-template-columns:1fr}
-      .row{grid-template-columns:1fr}
-      .view-tab{padding:10px 12px}
-      .topbar-row{gap:8px}
-      .modal{padding:12px}
+    @media (max-width: 430px) {
+      .grid { grid-template-columns:1fr; }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <aside class="panel sidebar">
-      <div class="brand">
-        <h1>Xanadu</h1>
-        <button class="btn" id="installBtnDesktop" hidden>Instalar</button>
+    <aside class="sidebar">
+      <div class="brand-row">
+        <h1 class="brand">Xanadu</h1>
+        <button class="install-btn" type="button" id="installBtn">Instalar</button>
       </div>
-
-      <div class="search">
-        <span>🔎</span>
-        <input id="searchDesktop" type="search" placeholder="Buscar..." />
+      <div class="sidebar-block">
+        <input id="searchInput" class="search" placeholder="🔎  Buscar..." />
       </div>
-
-      <div class="stack">
-        <div>
-          <h3 class="section-title">Vista</h3>
-          <div class="chips" id="sidebarViews"></div>
-        </div>
-
-        <div>
-          <h3 class="section-title">Orden</h3>
-          <div class="chips" id="sidebarSorts"></div>
-        </div>
-
-        <div>
-          <h3 class="section-title">Década</h3>
-          <div class="chips" id="sidebarDecades"></div>
-        </div>
-
-        <div>
-          <h3 class="section-title">Idioma</h3>
-          <div class="chips" id="sidebarLanguages"></div>
-        </div>
+      <div class="sidebar-block">
+        <p class="block-title">Vista</p>
+        <div class="chip-group" id="viewGroup"></div>
       </div>
-
-      <div class="sidebar-footer">
-        <button class="btn" id="exportBtnDesktop">Exportar JSON</button>
-        <button class="btn" id="importBtnDesktop">Importar JSON</button>
-        <button class="btn" id="openDefaultsBtn">Preferencias</button>
-        <div class="note">Funciona sin conexión una vez cargada. Para pasar la biblioteca del celular a la PC, exportá el JSON y luego importalo en la otra app.</div>
+      <div class="sidebar-block">
+        <p class="block-title">Orden</p>
+        <div class="chip-group" id="sortGroup"></div>
+      </div>
+      <div class="sidebar-block">
+        <p class="block-title">Década</p>
+        <div class="chip-group" id="decadeGroup"></div>
+      </div>
+      <div class="sidebar-block">
+        <p class="block-title">Idioma</p>
+        <div class="chip-group" id="languageGroup"></div>
       </div>
     </aside>
 
-    <main class="main">
-      <section class="panel topbar">
-        <div class="topbar-row" id="topViews"></div>
-        <div class="topbar-row" id="topSorts"></div>
-        <div class="topbar-row" id="topFilters"></div>
-        <div class="mobile-search">
-          <div class="search">
-            <span>🔎</span>
-            <input id="searchMobile" type="search" placeholder="Buscar..." />
-          </div>
-        </div>
-      </section>
-
-      <section class="content">
-        <div class="collection-head">
+    <main class="content">
+      <section class="panel">
+        <div class="hero">
           <div>
-            <h2 id="collectionTitle">Biblioteca</h2>
-            <p id="collectionSubtitle">Últimos añadidos, primero.</p>
+            <h2 id="screenTitle">Biblioteca</h2>
+            <p id="screenSubtitle">Últimos añadidos primero.</p>
           </div>
-          <div class="utility-row">
-            <span class="muted" id="countLabel">0 ítems</span>
-            <button class="btn" id="exportBtnMain">Exportar</button>
-            <button class="btn" id="importBtnMain">Importar</button>
+          <div class="head-actions">
+            <span id="countLabel">0 ítems</span>
+            <button class="ghost-btn" id="exportBtn" type="button">Exportar</button>
+            <button class="ghost-btn" id="importBtn" type="button">Importar</button>
+            <input id="importFile" type="file" accept="application/json" hidden />
           </div>
         </div>
-        <div id="cards" class="cards"></div>
-        <div id="emptyState" class="empty" hidden></div>
+        <div id="cardsGrid" class="grid"></div>
+        <div id="emptyState" class="empty">No hay ítems para mostrar con esta combinación.</div>
       </section>
     </main>
   </div>
 
-  <button class="fab" id="fabAdd" aria-label="Agregar">＋</button>
-
-  <div class="mobile-bottom">
-    <button class="btn active" data-mobile-view="biblioteca">Biblioteca</button>
-    <button class="btn" id="mobileSearchToggle">Buscar</button>
-    <button class="btn btn-primary" id="mobileAddBtn">Agregar</button>
+  <button class="fab" id="addBtn" type="button">＋</button>
+  <div class="mobile-bar">
+    <button class="mobile-btn" type="button" id="mobileViewBtn">Biblioteca</button>
+    <button class="mobile-btn" type="button" id="mobileSearchBtn">Buscar</button>
+    <button class="mobile-add" type="button" id="mobileAddBtn">＋</button>
   </div>
 
-  <input id="importFile" type="file" accept="application/json" hidden />
-
-  <div class="modal" id="bookModal" aria-hidden="true">
-    <div class="modal-box">
+  <div class="modal" id="itemModal">
+    <div class="modal-card">
       <div class="modal-head">
-        <h3 id="modalTitle">Agregar ítem</h3>
-        <button class="btn" id="closeModalBtn">Cerrar ✕</button>
+        <h3 id="modalTitle">Agregar</h3>
+        <button class="close-btn" id="closeModalBtn" type="button">×</button>
       </div>
-      <div class="modal-body">
+      <form id="itemForm" class="form-grid">
         <input type="hidden" id="editingId" />
-        <div class="row">
-          <div class="field">
-            <label for="titleInput">Título</label>
-            <input id="titleInput" maxlength="160" placeholder="Ej. 1984" />
-          </div>
-          <div class="field">
-            <label for="subtitleInput">Subtítulo (opcional)</label>
-            <input id="subtitleInput" maxlength="180" placeholder="Ej. Novela distópica" />
-          </div>
+        <div>
+          <label class="label" for="title">Título</label>
+          <input class="input" id="title" required />
         </div>
-
-        <div class="field">
-          <label for="authorsInput">Autor/es</label>
-          <input id="authorsInput" maxlength="180" placeholder="Ej. George Orwell" />
+        <div>
+          <label class="label" for="subtitle">Subtítulo</label>
+          <input class="input" id="subtitle" />
         </div>
-
-        <div class="row">
-          <div class="field">
-            <label for="typeInput">Tipo</label>
-            <select id="typeInput">
-              <option value="libro">Libro</option>
-              <option value="revista">Revista</option>
-              <option value="comic">Cómic</option>
-              <option value="otro">Otro</option>
+        <div>
+          <label class="label" for="authors">Autor/es</label>
+          <input class="input" id="authors" />
+        </div>
+        <div class="row cols-2">
+          <div>
+            <label class="label" for="type">Tipo</label>
+            <select class="select" id="type">
+              <option>Libro</option>
+              <option>Revista</option>
+              <option>Comic</option>
+              <option>Otro</option>
             </select>
           </div>
-          <div class="field">
-            <label for="statusInput">Vista</label>
-            <select id="statusInput">
-              <option value="biblioteca">Biblioteca</option>
-              <option value="a-descubrir">A descubrir</option>
-              <option value="va-y-vuelve">Va y vuelve</option>
+          <div>
+            <label class="label" for="status">Estado principal</label>
+            <select class="select" id="status">
+              <option>Biblioteca</option>
+              <option>Va y vuelve</option>
             </select>
           </div>
         </div>
-
-        <div class="row">
-          <div class="field">
-            <label for="publisherInput">Editorial</label>
-            <input id="publisherInput" maxlength="120" placeholder="Ej. Anagrama" />
+        <div class="row cols-2">
+          <div>
+            <label class="label" for="publisher">Editorial</label>
+            <input class="input" id="publisher" />
           </div>
-          <div class="field">
-            <label for="genreInput">Género</label>
-            <input id="genreInput" maxlength="120" placeholder="Ej. Ensayo / Novela / Poesía" />
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="field">
-            <label for="yearInput">Año</label>
-            <input id="yearInput" maxlength="4" inputmode="numeric" placeholder="Ej. 1998" />
-          </div>
-          <div class="field">
-            <label for="languageInput">Idioma</label>
-            <select id="languageInput">
-              <option value="Español">Español</option>
-              <option value="Inglés">Inglés</option>
-              <option value="Francés">Francés</option>
-              <option value="Italiano">Italiano</option>
-              <option value="Portugués">Portugués</option>
-              <option value="Alemán">Alemán</option>
-              <option value="Griego">Griego</option>
-              <option value="Latín">Latín</option>
-              <option value="Otro">Otro</option>
-            </select>
+          <div>
+            <label class="label" for="genre">Género</label>
+            <input class="input" id="genre" />
           </div>
         </div>
-
-        <div class="field">
-          <label for="guardianInput">Guardián</label>
-          <input id="guardianInput" maxlength="100" placeholder="Ej. Casa / Juan / Biblioteca personal" />
-        </div>
-
-        <div class="field">
-          <label for="notesInput">Notas (opcional)</label>
-          <textarea id="notesInput" maxlength="700" placeholder="Edición, observaciones, dónde está, etc."></textarea>
-        </div>
-
-        <div class="field">
-          <label>Imagen de tapa</label>
-          <div class="cover-preview">
-            <div class="cover-thumb" id="coverThumb">Sin imagen</div>
-            <div class="stack">
-              <div class="note">En celular puede abrir cámara. En desktop abre selector de archivo. La imagen se reduce antes de guardarse.</div>
-              <div class="utility-row">
-                <label class="btn btn-primary" for="coverInput">📷 Subir o tomar foto</label>
-                <button class="btn" id="removeCoverBtn" type="button">Quitar</button>
-                <input id="coverInput" type="file" accept="image/*" capture="environment" hidden />
-              </div>
-            </div>
+        <div class="row cols-2">
+          <div>
+            <label class="label" for="year">Año</label>
+            <input class="input" id="year" inputmode="numeric" />
+          </div>
+          <div>
+            <label class="label" for="language">Idioma</label>
+            <input class="input" id="language" value="Español" />
           </div>
         </div>
-      </div>
-      <div class="modal-actions">
-        <div class="note">Idioma por defecto: Español. Guardián por defecto: el último cargado con valor.</div>
-        <div class="utility-row">
-          <button class="btn btn-danger" id="deleteItemBtn" type="button" hidden>Borrar ítem</button>
-          <button class="btn" id="cancelModalBtn" type="button">Cancelar</button>
-          <button class="btn btn-primary" id="saveItemBtn" type="button">Guardar</button>
+        <div>
+          <label class="label" for="guardian">Guardián</label>
+          <input class="input" id="guardian" placeholder="Se completa con el último cargado" />
         </div>
-      </div>
+        <div class="row cols-2">
+          <label class="chip" style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input id="isGem" type="checkbox" /> 💎 Joyita</label>
+          <label class="chip" style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input id="toDiscover" type="checkbox" /> 🧭 A descubrir</label>
+        </div>
+        <div>
+          <label class="label" for="notes">Notas</label>
+          <textarea class="textarea" id="notes"></textarea>
+        </div>
+        <div class="upload">
+          <label class="label" for="imageInput">Imagen</label>
+          <input id="imageInput" type="file" accept="image/*" capture="environment" />
+          <div class="upload-preview" id="uploadPreview"><img id="previewImg" alt="Preview" /></div>
+        </div>
+        <div class="modal-actions">
+          <button class="secondary-btn" type="button" id="cancelBtn">Cancelar</button>
+          <button class="primary-btn" type="submit">Guardar</button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <div class="modal" id="defaultsModal" aria-hidden="true">
-    <div class="modal-box" style="max-width:520px;">
-      <div class="modal-head">
-        <h3>Preferencias</h3>
-        <button class="btn" id="closeDefaultsBtn">Cerrar ✕</button>
+  <dialog id="loanDialog">
+    <form method="dialog" class="dialog-grid" id="loanForm">
+      <h3 style="margin:0;">Va y vuelve</h3>
+      <div>
+        <label class="label" for="loanPerson">Prestado a</label>
+        <input class="input" id="loanPerson" required />
       </div>
-      <div class="modal-body">
-        <div class="field">
-          <label for="defaultLanguageInput">Idioma por defecto</label>
-          <select id="defaultLanguageInput">
-            <option value="Español">Español</option>
-            <option value="Inglés">Inglés</option>
-            <option value="Francés">Francés</option>
-            <option value="Italiano">Italiano</option>
-            <option value="Portugués">Portugués</option>
-            <option value="Alemán">Alemán</option>
-            <option value="Griego">Griego</option>
-            <option value="Latín">Latín</option>
-            <option value="Otro">Otro</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="defaultGuardianInput">Guardián por defecto</label>
-          <input id="defaultGuardianInput" maxlength="100" placeholder="Se usa al abrir Agregar" />
-        </div>
+      <div>
+        <label class="label" for="loanNote">Nota</label>
+        <input class="input" id="loanNote" />
       </div>
-      <div class="modal-actions">
-        <div class="note">El guardián se actualiza automáticamente cuando guardás un ítem con un nuevo valor.</div>
-        <div class="utility-row">
-          <button class="btn" id="resetDefaultsBtn" type="button">Restaurar</button>
-          <button class="btn btn-primary" id="saveDefaultsBtn" type="button">Guardar preferencias</button>
-        </div>
+      <div class="dialog-actions">
+        <button class="secondary-btn" value="cancel">Cancelar</button>
+        <button class="primary-btn" value="default">Guardar</button>
       </div>
-    </div>
-  </div>
-
-  <div id="toast" class="toast"></div>
+    </form>
+  </dialog>
 
   <script>
-    const DB_NAME = 'xanadu-db';
-    const DB_VERSION = 1;
-    const BOOK_STORE = 'books';
-    const META_STORE = 'meta';
-    const APP_CACHE = 'xanadu-shell-v1';
-    const SOFT_JOYITAS_LIMIT = 12;
+    const DB_NAME = 'xanadu_db_v1';
+    const STORE = 'items';
+    const META = 'meta';
+    const views = ['Biblioteca', 'Joyitas', 'A descubrir', 'Va y vuelve'];
+    const sorts = ['Recientes', 'Año', 'Autor'];
+    const decades = ['Todas', '2020', '2010', '2000', '1990', '1980'];
+    const langs = ['Todos', 'ES', 'EN', 'FR', 'Otros'];
 
-    const VIEW_OPTIONS = [
-      { id: 'biblioteca', label: 'Biblioteca', emoji: '📚' },
-      { id: 'joyitas', label: 'Joyitas', emoji: '💎' },
-      { id: 'a-descubrir', label: 'A descubrir', emoji: '🧭' },
-      { id: 'va-y-vuelve', label: 'Va y vuelve', emoji: '↔️' }
-    ];
-
-    const SORT_OPTIONS = [
-      { id: 'recent', label: 'Recientes' },
-      { id: 'year', label: 'Año' },
-      { id: 'author', label: 'Autor' }
-    ];
-
-    const LANGUAGE_FILTERS = [
-      { id: 'all', label: 'Todos' },
-      { id: 'Español', label: 'ES' },
-      { id: 'Inglés', label: 'EN' },
-      { id: 'Francés', label: 'FR' },
-      { id: 'Otros', label: 'Otros' }
-    ];
-
-    const state = {
-      db: null,
-      books: [],
-      view: 'biblioteca',
-      sort: 'recent',
-      decade: 'all',
-      language: 'all',
-      search: '',
-      defaults: {
-        defaultLanguage: 'Español',
-        defaultGuardian: ''
-      },
-      editingId: null,
-      pendingCover: null,
-      deferredPrompt: null
-    };
+    const state = { view:'Biblioteca', sort:'Recientes', decade:'Todas', language:'Todos', search:'' };
+    let db;
+    let books = [];
+    let deferredPrompt = null;
+    let pendingImage = '';
+    let loanTargetId = null;
 
     const els = {
-      cards: document.getElementById('cards'),
-      emptyState: document.getElementById('emptyState'),
-      collectionTitle: document.getElementById('collectionTitle'),
-      collectionSubtitle: document.getElementById('collectionSubtitle'),
-      countLabel: document.getElementById('countLabel'),
-      sidebarViews: document.getElementById('sidebarViews'),
-      sidebarSorts: document.getElementById('sidebarSorts'),
-      sidebarDecades: document.getElementById('sidebarDecades'),
-      sidebarLanguages: document.getElementById('sidebarLanguages'),
-      topViews: document.getElementById('topViews'),
-      topSorts: document.getElementById('topSorts'),
-      topFilters: document.getElementById('topFilters'),
-      searchDesktop: document.getElementById('searchDesktop'),
-      searchMobile: document.getElementById('searchMobile'),
-      importFile: document.getElementById('importFile'),
-      bookModal: document.getElementById('bookModal'),
-      defaultsModal: document.getElementById('defaultsModal'),
-      fabAdd: document.getElementById('fabAdd'),
-      mobileAddBtn: document.getElementById('mobileAddBtn'),
-      mobileSearchToggle: document.getElementById('mobileSearchToggle'),
-      installBtnDesktop: document.getElementById('installBtnDesktop'),
-      exportBtnDesktop: document.getElementById('exportBtnDesktop'),
-      exportBtnMain: document.getElementById('exportBtnMain'),
-      importBtnDesktop: document.getElementById('importBtnDesktop'),
-      importBtnMain: document.getElementById('importBtnMain'),
-      openDefaultsBtn: document.getElementById('openDefaultsBtn'),
-      closeDefaultsBtn: document.getElementById('closeDefaultsBtn'),
-      defaultLanguageInput: document.getElementById('defaultLanguageInput'),
-      defaultGuardianInput: document.getElementById('defaultGuardianInput'),
-      saveDefaultsBtn: document.getElementById('saveDefaultsBtn'),
-      resetDefaultsBtn: document.getElementById('resetDefaultsBtn'),
-      modalTitle: document.getElementById('modalTitle'),
-      editingId: document.getElementById('editingId'),
-      titleInput: document.getElementById('titleInput'),
-      subtitleInput: document.getElementById('subtitleInput'),
-      authorsInput: document.getElementById('authorsInput'),
-      typeInput: document.getElementById('typeInput'),
-      statusInput: document.getElementById('statusInput'),
-      publisherInput: document.getElementById('publisherInput'),
-      genreInput: document.getElementById('genreInput'),
-      yearInput: document.getElementById('yearInput'),
-      languageInput: document.getElementById('languageInput'),
-      guardianInput: document.getElementById('guardianInput'),
-      notesInput: document.getElementById('notesInput'),
-      coverInput: document.getElementById('coverInput'),
-      coverThumb: document.getElementById('coverThumb'),
-      removeCoverBtn: document.getElementById('removeCoverBtn'),
-      saveItemBtn: document.getElementById('saveItemBtn'),
-      cancelModalBtn: document.getElementById('cancelModalBtn'),
-      closeModalBtn: document.getElementById('closeModalBtn'),
-      deleteItemBtn: document.getElementById('deleteItemBtn'),
-      toast: document.getElementById('toast'),
+      viewGroup: document.getElementById('viewGroup'), sortGroup: document.getElementById('sortGroup'),
+      decadeGroup: document.getElementById('decadeGroup'), languageGroup: document.getElementById('languageGroup'),
+      screenTitle: document.getElementById('screenTitle'), screenSubtitle: document.getElementById('screenSubtitle'),
+      countLabel: document.getElementById('countLabel'), cardsGrid: document.getElementById('cardsGrid'), emptyState: document.getElementById('emptyState'),
+      searchInput: document.getElementById('searchInput'), exportBtn: document.getElementById('exportBtn'), importBtn: document.getElementById('importBtn'), importFile: document.getElementById('importFile'),
+      addBtn: document.getElementById('addBtn'), mobileAddBtn: document.getElementById('mobileAddBtn'), mobileViewBtn: document.getElementById('mobileViewBtn'), mobileSearchBtn: document.getElementById('mobileSearchBtn'),
+      itemModal: document.getElementById('itemModal'), closeModalBtn: document.getElementById('closeModalBtn'), cancelBtn: document.getElementById('cancelBtn'), itemForm: document.getElementById('itemForm'), modalTitle: document.getElementById('modalTitle'),
+      editingId: document.getElementById('editingId'), imageInput: document.getElementById('imageInput'), uploadPreview: document.getElementById('uploadPreview'), previewImg: document.getElementById('previewImg'),
+      installBtn: document.getElementById('installBtn'), loanDialog: document.getElementById('loanDialog'), loanForm: document.getElementById('loanForm'), loanPerson: document.getElementById('loanPerson'), loanNote: document.getElementById('loanNote')
     };
 
-    function toast(message){
-      els.toast.textContent = message;
-      els.toast.classList.add('show');
-      clearTimeout(toast._t);
-      toast._t = setTimeout(() => els.toast.classList.remove('show'), 2600);
-    }
+    function uid(){ return 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
+    function norm(v){ return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
+    function compact(arr){ return arr.filter(Boolean); }
+    function decadeOf(year){ const n=parseInt(year,10); return n ? String(Math.floor(n/10)*10) : ''; }
+    function languageCode(v){ const x=norm(v); if (x.startsWith('es')) return 'ES'; if (x.startsWith('en') || x.includes('ingles')) return 'EN'; if (x.startsWith('fr') || x.includes('frances')) return 'FR'; return x ? 'Otros' : 'Otros'; }
+    function escapeHtml(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
 
-    function normalizeText(value){
-      return String(value || '')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
-
-    function typeLabel(type){
-      if(type === 'revista') return 'Revista';
-      if(type === 'comic') return 'Cómic';
-      if(type === 'otro') return 'Otro';
-      return 'Libro';
-    }
-
-    function statusLabel(status){
-      if(status === 'a-descubrir') return 'A descubrir';
-      if(status === 'va-y-vuelve') return 'Va y vuelve';
-      return 'Biblioteca';
-    }
-
-    function computeDecade(year){
-      const n = Number(String(year || '').trim());
-      if(!Number.isFinite(n) || n < 0) return null;
-      return String(Math.floor(n / 10) * 10);
-    }
-
-    function deriveDecades(books){
-      const decades = [...new Set(books.map(b => b.decade).filter(Boolean))].sort((a,b)=>Number(b)-Number(a));
-      return [{id:'all', label:'Todas'}].concat(decades.map(d => ({id:d, label:d})));
-    }
-
-    function langFilterPass(bookLang, filter){
-      if(filter === 'all') return true;
-      if(filter === 'Otros') return !['Español','Inglés','Francés'].includes(bookLang);
-      return bookLang === filter;
-    }
-
-    function openDB(){
-      return new Promise((resolve, reject) => {
-        const req = indexedDB.open(DB_NAME, DB_VERSION);
-        req.onupgradeneeded = (event) => {
-          const db = event.target.result;
-          if(!db.objectStoreNames.contains(BOOK_STORE)){
-            db.createObjectStore(BOOK_STORE, { keyPath: 'id' });
-          }
-          if(!db.objectStoreNames.contains(META_STORE)){
-            db.createObjectStore(META_STORE, { keyPath: 'key' });
-          }
+    function openDb(){
+      return new Promise((resolve,reject)=>{
+        const req=indexedDB.open(DB_NAME,1);
+        req.onupgradeneeded=()=>{
+          const db=req.result;
+          if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE,{keyPath:'id'});
+          if(!db.objectStoreNames.contains(META)) db.createObjectStore(META,{keyPath:'key'});
         };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
+        req.onsuccess=()=>resolve(req.result);
+        req.onerror=()=>reject(req.error);
       });
     }
+    function tx(storeName, mode='readonly'){ return db.transaction(storeName,mode).objectStore(storeName); }
+    function storePut(storeName, value){ return new Promise((res,rej)=>{ const r=tx(storeName,'readwrite').put(value); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
+    function storeDelete(storeName, key){ return new Promise((res,rej)=>{ const r=tx(storeName,'readwrite').delete(key); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
+    function storeGet(storeName, key){ return new Promise((res,rej)=>{ const r=tx(storeName).get(key); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+    function storeGetAll(storeName){ return new Promise((res,rej)=>{ const r=tx(storeName).getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=()=>rej(r.error); }); }
 
-    function tx(storeName, mode='readonly'){
-      return state.db.transaction(storeName, mode).objectStore(storeName);
+    async function seedIfEmpty(){
+      const all = await storeGetAll(STORE);
+      if (all.length) { books = all; return; }
+      const sample = [
+        { id:uid(), title:'Watchmen', subtitle:'', authors:'Alan Moore y Dave Gibbons', type:'Comic', status:'Biblioteca', publisher:'Planeta', genre:'Novela gráfica', year:'2008', language:'Español', guardian:'Luciano', notes:'', image:'', isGem:false, toDiscover:false, loanedTo:'', loanHistory:[], createdAt:Date.now()-10000, updatedAt:Date.now()-10000 },
+        { id:uid(), title:'1984', subtitle:'', authors:'George Orwell', type:'Libro', status:'Biblioteca', publisher:'Debolsillo', genre:'Novela', year:'1984', language:'Español', guardian:'Luciano', notes:'', image:'', isGem:false, toDiscover:false, loanedTo:'', loanHistory:[], createdAt:Date.now()-5000, updatedAt:Date.now()-5000 }
+      ];
+      for (const item of sample) await storePut(STORE, item);
+      await storePut(META, { key:'lastGuardian', value:'Luciano' });
+      books = sample;
     }
 
-    function getAllBooks(){
-      return new Promise((resolve, reject) => {
-        const req = tx(BOOK_STORE).getAll();
-        req.onsuccess = () => resolve(req.result || []);
-        req.onerror = () => reject(req.error);
-      });
+    function renderChipSet(container, items, active, onClick){
+      container.innerHTML = items.map(item => `<button type="button" class="chip ${item===active?'active':''} ${container===els.viewGroup?'nav-chip':''}" data-v="${item}">${item}</button>`).join('');
+      [...container.querySelectorAll('button')].forEach(btn=>btn.addEventListener('click',()=>onClick(btn.dataset.v)));
     }
-
-    function putBook(book){
-      return new Promise((resolve, reject) => {
-        const req = tx(BOOK_STORE, 'readwrite').put(book);
-        req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    function deleteBookById(id){
-      return new Promise((resolve, reject) => {
-        const req = tx(BOOK_STORE, 'readwrite').delete(id);
-        req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    function clearBooksStore(){
-      return new Promise((resolve, reject) => {
-        const req = tx(BOOK_STORE, 'readwrite').clear();
-        req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    function putMeta(key, value){
-      return new Promise((resolve, reject) => {
-        const req = tx(META_STORE, 'readwrite').put({ key, value });
-        req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    function getMeta(key){
-      return new Promise((resolve, reject) => {
-        const req = tx(META_STORE).get(key);
-        req.onsuccess = () => resolve(req.result ? req.result.value : undefined);
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    function uid(){
-      if(crypto.randomUUID) return crypto.randomUUID();
-      return String(Date.now() + Math.random());
-    }
-
-    async function readDefaults(){
-      const defaults = await getMeta('defaults');
-      state.defaults = {
-        defaultLanguage: defaults?.defaultLanguage || 'Español',
-        defaultGuardian: defaults?.defaultGuardian || ''
-      };
-      els.defaultLanguageInput.value = state.defaults.defaultLanguage;
-      els.defaultGuardianInput.value = state.defaults.defaultGuardian;
-    }
-
-    async function saveDefaults(defaults){
-      state.defaults = {
-        defaultLanguage: defaults.defaultLanguage || 'Español',
-        defaultGuardian: defaults.defaultGuardian || ''
-      };
-      await putMeta('defaults', state.defaults);
-      els.defaultLanguageInput.value = state.defaults.defaultLanguage;
-      els.defaultGuardianInput.value = state.defaults.defaultGuardian;
-      toast('Preferencias guardadas.');
-    }
-
-    function buildViewTabs(container, activeId){
-      container.innerHTML = VIEW_OPTIONS.map(v => `
-        <button class="view-tab ${v.id === activeId ? 'active' : ''}" data-view="${v.id}">
-          <span class="emoji">${v.emoji}</span>${v.label}
-        </button>
-      `).join('');
-    }
-
-    function buildSortTabs(container, activeId){
-      container.innerHTML = SORT_OPTIONS.map(v => `
-        <button class="sort-tab ${v.id === activeId ? 'active' : ''}" data-sort="${v.id}">
-          ${v.label}
-        </button>
-      `).join('');
-    }
-
-    function buildDecadeChips(container, activeId){
-      const options = deriveDecades(state.books);
-      container.innerHTML = options.map(v => `
-        <button class="chip small ${v.id === activeId ? 'active' : ''}" data-decade="${v.id}">
-          ${v.label}
-        </button>
-      `).join('');
-    }
-
-    function buildLanguageChips(container, activeId){
-      container.innerHTML = LANGUAGE_FILTERS.map(v => `
-        <button class="chip small ${v.id === activeId ? 'active' : ''}" data-language="${v.id}">
-          ${v.label}
-        </button>
-      `).join('');
-    }
-
-    function renderControls(){
-      buildViewTabs(els.sidebarViews, state.view);
-      buildViewTabs(els.topViews, state.view);
-      buildSortTabs(els.sidebarSorts, state.sort);
-      buildSortTabs(els.topSorts, state.sort);
-      buildDecadeChips(els.sidebarDecades, state.decade);
-      buildLanguageChips(els.sidebarLanguages, state.language);
-
-      els.topFilters.innerHTML = `
-        <span class="label">Década</span>
-        ${deriveDecades(state.books).map(v => `
-          <button class="chip small ${v.id === state.decade ? 'active' : ''}" data-decade="${v.id}">${v.label}</button>
-        `).join('')}
-        <span class="label" style="margin-left:8px;">Idioma</span>
-        ${LANGUAGE_FILTERS.map(v => `
-          <button class="chip small ${v.id === state.language ? 'active' : ''}" data-language="${v.id}">${v.label}</button>
-        `).join('')}
-      `;
-
-      document.querySelectorAll('.mobile-bottom .btn[data-mobile-view]').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.mobileView === state.view);
-      });
-    }
-
-    function getSearchValue(){
-      return normalizeText(els.searchDesktop.value || els.searchMobile.value || state.search);
+    function renderFilters(){
+      renderChipSet(els.viewGroup, views, state.view, v=>{ state.view=v; render(); });
+      renderChipSet(els.sortGroup, sorts, state.sort, v=>{ state.sort=v; render(); });
+      renderChipSet(els.decadeGroup, decades, state.decade, v=>{ state.decade=v; render(); });
+      renderChipSet(els.languageGroup, langs, state.language, v=>{ state.language=v; render(); });
+      els.mobileViewBtn.textContent = state.view;
     }
 
     function filteredBooks(){
-      const q = getSearchValue();
-      let items = [...state.books];
-
-      if(state.view === 'joyitas'){
-        items = items.filter(b => !!b.isJoyita);
-      }else{
-        items = items.filter(b => b.status === state.view);
-      }
-
-      if(state.decade !== 'all'){
-        items = items.filter(b => b.decade === state.decade);
-      }
-
-      if(state.language !== 'all'){
-        items = items.filter(b => langFilterPass(b.language || 'Español', state.language));
-      }
-
-      if(q){
-        items = items.filter(b => {
-          const haystack = normalizeText([
-            b.title, b.subtitle, b.authors, b.publisher, b.genre, b.year, b.language, b.guardian, b.notes, typeLabel(b.type), statusLabel(b.status)
-          ].join(' '));
-          return haystack.includes(q);
-        });
-      }
-
-      items.sort((a,b) => {
-        if(state.view === 'joyitas'){
-          return (a.joyitaOrder ?? 9999) - (b.joyitaOrder ?? 9999) || new Date(b.updatedAt) - new Date(a.updatedAt);
-        }
-        if(state.sort === 'year'){
-          return Number(b.year || 0) - Number(a.year || 0) || new Date(b.updatedAt) - new Date(a.updatedAt);
-        }
-        if(state.sort === 'author'){
-          return (a.authors || '').localeCompare(b.authors || '', 'es') || new Date(b.updatedAt) - new Date(a.updatedAt);
-        }
-        return new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt);
+      let list = books.filter(book => {
+        if (state.view === 'Biblioteca') return book.status === 'Biblioteca';
+        if (state.view === 'Va y vuelve') return book.status === 'Va y vuelve';
+        if (state.view === 'Joyitas') return book.isGem;
+        if (state.view === 'A descubrir') return book.toDiscover;
+        return true;
       });
-
-      return items;
+      if (state.decade !== 'Todas') list = list.filter(b => decadeOf(b.year) === state.decade);
+      if (state.language !== 'Todos') list = list.filter(b => languageCode(b.language) === state.language);
+      if (state.search) {
+        const q = norm(state.search);
+        list = list.filter(b => norm([b.title,b.subtitle,b.authors,b.publisher,b.genre,b.language,b.guardian,b.notes,b.loanedTo,b.year].join(' ')).includes(q));
+      }
+      list = list.slice();
+      if (state.sort === 'Recientes') list.sort((a,b) => (b.updatedAt||b.createdAt) - (a.updatedAt||a.createdAt));
+      if (state.sort === 'Año') list.sort((a,b)=>Number(b.year||0)-Number(a.year||0));
+      if (state.sort === 'Autor') list.sort((a,b)=>(a.authors||'').localeCompare(b.authors||'','es'));
+      return list;
     }
 
-    function collectionMeta(){
-      if(state.view === 'joyitas'){
-        return {
-          title:'Joyitas',
-          subtitle:'Selección manual. Límite blando recomendado: 12.',
-        };
-      }
-      if(state.view === 'a-descubrir'){
-        return { title:'A descubrir', subtitle:'Lo pendiente por explorar.' };
-      }
-      if(state.view === 'va-y-vuelve'){
-        return { title:'Va y vuelve', subtitle:'Ítems prestados o circulando.' };
-      }
-      return { title:'Biblioteca', subtitle:'Últimos añadidos primero.' };
+    function screenSubtitle(){
+      if (state.view === 'Joyitas') return 'Curaduría manual.';
+      if (state.view === 'A descubrir') return 'Lo que querés tener cerca o buscar más adelante.';
+      if (state.view === 'Va y vuelve') return 'Ítems prestados y con memoria de circulación.';
+      if (state.sort === 'Recientes') return 'Últimos añadidos primero.';
+      if (state.sort === 'Año') return 'Ordenados por año.';
+      return 'Ordenados por autor.';
     }
 
-    function escapeHtml(value){
-      return String(value || '')
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#039;');
-    }
-
-    function renderCards(){
-      renderControls();
-      const meta = collectionMeta();
-      els.collectionTitle.textContent = meta.title;
-      els.collectionSubtitle.textContent = meta.subtitle;
-
-      const items = filteredBooks();
-      els.countLabel.textContent = `${items.length} ${items.length === 1 ? 'ítem' : 'ítems'}`;
-
-      if(!items.length){
-        els.cards.innerHTML = '';
-        els.emptyState.hidden = false;
-        els.emptyState.textContent = state.view === 'joyitas'
-          ? 'Todavía no hay joyitas. Podés marcarlas con el ícono de gema en cada tarjeta.'
-          : 'No hay ítems para mostrar con estos filtros.';
-        return;
-      }
-      els.emptyState.hidden = true;
-
-      els.cards.innerHTML = items.map(book => `
-        <article class="card">
-          <div class="cover">
-            ${book.cover ? `<img src="${book.cover}" alt="Tapa de ${escapeHtml(book.title)}" />`
-              : `<div class="cover-placeholder">${escapeHtml(book.title || 'Sin título')}</div>`}
-          </div>
+    function render(){
+      renderFilters();
+      const list = filteredBooks();
+      els.screenTitle.textContent = state.view;
+      els.screenSubtitle.textContent = screenSubtitle();
+      els.countLabel.textContent = `${list.length} ítem${list.length===1?'':'s'}`;
+      els.cardsGrid.innerHTML = list.map(book => {
+        const latest = book.loanHistory && book.loanHistory.length ? book.loanHistory[0] : null;
+        const cover = book.image ? `<img src="${book.image}" alt="${escapeHtml(book.title)}">` : `<div class="placeholder-title">${escapeHtml(book.title)}</div>`;
+        const loanBadge = book.status === 'Va y vuelve' ? `Prestado${book.loanedTo ? ` a ${escapeHtml(book.loanedTo)}` : ''}` : escapeHtml(book.status);
+        const history = latest ? `<div class="history">Último movimiento: ${latest.action}${latest.person ? ` · ${escapeHtml(latest.person)}` : ''}${latest.note ? ` · ${escapeHtml(latest.note)}` : ''}</div>` : '';
+        return `<article class="card">
+          <div class="cover">${cover}</div>
           <div class="card-body">
             <h3 class="title">${escapeHtml(book.title)}</h3>
             ${book.subtitle ? `<p class="subtitle">${escapeHtml(book.subtitle)}</p>` : ''}
-            <div class="authors">${escapeHtml(book.authors || 'Autor no cargado')}</div>
-            <div class="type-pill">${typeLabel(book.type)}</div>
-            <div class="meta">${[book.publisher, book.year].filter(Boolean).map(escapeHtml).join(' · ') || '&nbsp;'}</div>
-            <div class="meta">${escapeHtml(book.language || 'Español')}</div>
+            <p class="authors">${escapeHtml(book.authors||'')}</p>
+            <div class="badge-row"><span class="type-badge">${escapeHtml(book.type)}</span></div>
+            <div class="meta">${compact([book.publisher, book.year]).join(' · ')}</div>
+            <div class="meta">${compact([book.language, book.guardian ? `Guardián: ${book.guardian}` : '']).join(' · ')}</div>
+            ${book.notes ? `<div class="notes">${escapeHtml(book.notes)}</div>` : ''}
+            ${history}
             <div class="card-bottom">
-              <div class="left-bottom">
-                ${book.guardian ? `<div class="guardian-pill"><span>Guardián: ${escapeHtml(book.guardian)}</span></div>` : ''}
-                <div class="status-pill">${statusLabel(book.status)}</div>
+              <div class="card-actions">
+                <button type="button" class="icon-toggle ${book.isGem?'active':''}" data-action="gem" data-id="${book.id}">💎</button>
+                <button type="button" class="icon-toggle ${book.toDiscover?'active':''}" data-action="discover" data-id="${book.id}">🧭</button>
               </div>
-              <div class="utility-row">
-                <button class="gem-btn ${book.isJoyita ? 'active' : ''}" title="Joyita" data-gem="${book.id}">
-                  ${book.isJoyita ? '💎' : '◇'}
-                </button>
-                <button class="btn" data-edit="${book.id}">Editar</button>
-              </div>
+              <div class="status-badge ${book.status==='Va y vuelve'?'loaned':''}">${loanBadge}</div>
+            </div>
+            <div class="card-actions">
+              <button type="button" class="action-btn" data-action="edit" data-id="${book.id}">Editar</button>
+              ${book.status === 'Va y vuelve'
+                ? `<button type="button" class="loan-btn" data-action="return" data-id="${book.id}">Marcar regreso</button>`
+                : `<button type="button" class="loan-btn" data-action="loan" data-id="${book.id}">Prestar</button>`}
             </div>
           </div>
-        </article>
-      `).join('');
+        </article>`;
+      }).join('');
+      els.emptyState.style.display = list.length ? 'none' : 'block';
+      bindCardEvents();
     }
 
-    function fillForm(book = null){
-      state.editingId = book?.id || null;
-      els.editingId.value = state.editingId || '';
-      els.modalTitle.textContent = book ? 'Editar ítem' : 'Agregar ítem';
-      els.deleteItemBtn.hidden = !book;
-
-      els.titleInput.value = book?.title || '';
-      els.subtitleInput.value = book?.subtitle || '';
-      els.authorsInput.value = book?.authors || '';
-      els.typeInput.value = book?.type || 'libro';
-      els.statusInput.value = book?.status || (state.view === 'joyitas' ? 'biblioteca' : state.view);
-      els.publisherInput.value = book?.publisher || '';
-      els.genreInput.value = book?.genre || '';
-      els.yearInput.value = book?.year || '';
-      els.languageInput.value = book?.language || state.defaults.defaultLanguage || 'Español';
-      els.guardianInput.value = book?.guardian || state.defaults.defaultGuardian || '';
-      els.notesInput.value = book?.notes || '';
-      state.pendingCover = book?.cover || null;
-      updateCoverPreview();
+    function bindCardEvents(){
+      [...document.querySelectorAll('[data-action]')].forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const book = books.find(b => b.id === id);
+          if (!book) return;
+          const action = btn.dataset.action;
+          if (action === 'gem') {
+            if (!book.isGem && books.filter(x => x.isGem).length >= 12) { alert('Joyitas tiene un límite blando de 12.'); return; }
+            book.isGem = !book.isGem; book.updatedAt = Date.now(); await persistBook(book); render();
+          }
+          if (action === 'discover') { book.toDiscover = !book.toDiscover; book.updatedAt = Date.now(); await persistBook(book); render(); }
+          if (action === 'edit') openItemModal(book);
+          if (action === 'loan') { loanTargetId = id; els.loanPerson.value = book.loanedTo || ''; els.loanNote.value = ''; els.loanDialog.showModal(); }
+          if (action === 'return') {
+            book.status = 'Biblioteca';
+            book.loanHistory = [{ date: new Date().toISOString(), action: 'Regresó', person: book.loanedTo || '', note: '' }, ...(book.loanHistory || [])];
+            book.loanedTo = '';
+            book.updatedAt = Date.now();
+            await persistBook(book);
+            render();
+          }
+        });
+      });
     }
 
-    function updateCoverPreview(){
-      if(state.pendingCover){
-        els.coverThumb.innerHTML = `<img src="${state.pendingCover}" alt="Vista previa de tapa" />`;
-      }else{
-        els.coverThumb.textContent = 'Sin imagen';
+    async function persistBook(book){ books = books.map(b => b.id === book.id ? book : b); await storePut(STORE, book); }
+
+    function openItemModal(book=null){
+      els.itemModal.classList.add('active');
+      els.itemForm.reset();
+      pendingImage = '';
+      els.uploadPreview.style.display = 'none';
+      document.getElementById('language').value = 'Español';
+      document.getElementById('guardian').value = '';
+      document.getElementById('status').value = 'Biblioteca';
+      document.getElementById('isGem').checked = false;
+      document.getElementById('toDiscover').checked = false;
+      els.modalTitle.textContent = book ? 'Editar' : 'Agregar';
+      els.editingId.value = '';
+      if (!book) {
+        storeGet(META, 'lastGuardian').then(meta => { document.getElementById('guardian').value = meta?.value || ''; });
+        return;
+      }
+      els.editingId.value = book.id;
+      document.getElementById('title').value = book.title || '';
+      document.getElementById('subtitle').value = book.subtitle || '';
+      document.getElementById('authors').value = book.authors || '';
+      document.getElementById('type').value = book.type || 'Libro';
+      document.getElementById('status').value = book.status || 'Biblioteca';
+      document.getElementById('publisher').value = book.publisher || '';
+      document.getElementById('genre').value = book.genre || '';
+      document.getElementById('year').value = book.year || '';
+      document.getElementById('language').value = book.language || 'Español';
+      document.getElementById('guardian').value = book.guardian || '';
+      document.getElementById('notes').value = book.notes || '';
+      document.getElementById('isGem').checked = !!book.isGem;
+      document.getElementById('toDiscover').checked = !!book.toDiscover;
+      if (book.image) {
+        pendingImage = book.image;
+        els.previewImg.src = book.image;
+        els.uploadPreview.style.display = 'block';
       }
     }
+    function closeItemModal(){ els.itemModal.classList.remove('active'); }
 
-    function openModal(book = null){
-      fillForm(book);
-      els.bookModal.classList.add('active');
-      els.bookModal.setAttribute('aria-hidden', 'false');
-      setTimeout(() => els.titleInput.focus(), 30);
-    }
-
-    function closeModal(){
-      els.bookModal.classList.remove('active');
-      els.bookModal.setAttribute('aria-hidden', 'true');
-      state.editingId = null;
-      state.pendingCover = null;
-    }
-
-    function openDefaults(){
-      els.defaultLanguageInput.value = state.defaults.defaultLanguage;
-      els.defaultGuardianInput.value = state.defaults.defaultGuardian;
-      els.defaultsModal.classList.add('active');
-    }
-
-    function closeDefaults(){
-      els.defaultsModal.classList.remove('active');
-    }
-
+    async function fileToDataURL(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(file); }); }
     async function compressImage(file){
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-
-      const img = await new Promise((resolve, reject) => {
-        const image = new Image();
-        image.onload = () => resolve(image);
-        image.onerror = reject;
-        image.src = dataUrl;
-      });
-
-      const maxEdge = 900;
-      let { width, height } = img;
-      if(width > height && width > maxEdge){
-        height = Math.round(height * (maxEdge / width));
-        width = maxEdge;
-      }else if(height >= width && height > maxEdge){
-        width = Math.round(width * (maxEdge / height));
-        height = maxEdge;
-      }
-
+      const dataUrl = await fileToDataURL(file);
+      const img = new Image();
+      await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=dataUrl; });
+      const maxW = 700;
+      const scale = Math.min(1, maxW / img.width);
       const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d', { alpha: false });
-      ctx.fillStyle = '#f2e4d3';
-      ctx.fillRect(0,0,width,height);
-      ctx.drawImage(img, 0, 0, width, height);
-      return canvas.toDataURL('image/jpeg', 0.76);
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL('image/jpeg', 0.72);
     }
 
-    async function handleCoverInput(file){
-      if(!file) return;
-      state.pendingCover = await compressImage(file);
-      updateCoverPreview();
-      toast('Imagen lista.');
-    }
-
-    function collectFormData(existing = null){
-      const title = els.titleInput.value.trim();
-      if(!title){
-        toast('El título es obligatorio.');
-        els.titleInput.focus();
-        return null;
-      }
-      const year = els.yearInput.value.trim();
-      const book = {
-        id: existing?.id || uid(),
-        title,
-        subtitle: els.subtitleInput.value.trim(),
-        authors: els.authorsInput.value.trim(),
-        type: els.typeInput.value,
-        status: els.statusInput.value,
-        publisher: els.publisherInput.value.trim(),
-        genre: els.genreInput.value.trim(),
-        year,
-        decade: computeDecade(year),
-        language: els.languageInput.value || state.defaults.defaultLanguage || 'Español',
-        guardian: els.guardianInput.value.trim(),
-        notes: els.notesInput.value.trim(),
-        cover: state.pendingCover || null,
-        isJoyita: existing?.isJoyita || false,
-        joyitaOrder: existing?.joyitaOrder ?? null,
-        createdAt: existing?.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      return book;
-    }
-
-    async function saveBookFromForm(){
-      const existing = state.books.find(b => b.id === state.editingId);
-      const book = collectFormData(existing);
-      if(!book) return;
-
-      if(book.guardian){
-        state.defaults.defaultGuardian = book.guardian;
-        await putMeta('defaults', {
-          defaultLanguage: state.defaults.defaultLanguage,
-          defaultGuardian: state.defaults.defaultGuardian
-        });
-      }
-
-      await putBook(book);
-      await refreshBooks();
-      renderCards();
-      closeModal();
-      toast(existing ? 'Ítem actualizado.' : 'Ítem guardado.');
-    }
-
-    async function refreshBooks(){
-      state.books = await getAllBooks();
-    }
-
-    async function deleteCurrentBook(){
-      if(!state.editingId) return;
-      const book = state.books.find(b => b.id === state.editingId);
-      if(!book) return;
-      if(!confirm(`¿Borrar "${book.title}"?`)) return;
-      await deleteBookById(book.id);
-      await refreshBooks();
-      renderCards();
-      closeModal();
-      toast('Ítem borrado.');
-    }
-
-    async function toggleJoyita(id){
-      const book = state.books.find(b => b.id === id);
-      if(!book) return;
-      if(!book.isJoyita){
-        const joyitas = state.books.filter(b => b.isJoyita);
-        if(joyitas.length >= SOFT_JOYITAS_LIMIT){
-          toast('Ya hay muchas joyitas. Podés seguir, pero conviene mantener la selección chica.');
-        }
-        book.isJoyita = true;
-        book.joyitaOrder = joyitas.length
-          ? Math.max(...joyitas.map(j => j.joyitaOrder ?? 0)) + 1
-          : 1;
-      }else{
-        book.isJoyita = false;
-        book.joyitaOrder = null;
-      }
-      book.updatedAt = new Date().toISOString();
-      await putBook(book);
-      await refreshBooks();
-      renderCards();
-    }
-
-    async function exportJson(){
-      const payload = {
-        app: 'Xanadu',
-        version: 1,
-        exportedAt: new Date().toISOString(),
-        defaults: state.defaults,
-        books: state.books
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const file = new File([blob], `xanadu-${new Date().toISOString().slice(0,10)}.json`, { type: 'application/json' });
-
-      if(navigator.canShare && navigator.share){
-        try{
-          await navigator.share({ files: [file], title: 'Xanadu', text: 'Exportación de biblioteca Xanadu' });
-          toast('Archivo compartido.');
-          return;
-        }catch(err){}
-      }
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      toast('JSON exportado.');
-    }
-
-    async function importJson(file){
-      const text = await file.text();
-      const parsed = JSON.parse(text);
-      const books = Array.isArray(parsed) ? parsed : parsed.books;
-      if(!Array.isArray(books)) throw new Error('Formato inválido');
-      if(!confirm('Esto reemplazará la biblioteca actual de este dispositivo. ¿Seguimos?')) return;
-
-      await clearBooksStore();
-      for(const raw of books){
-        const normalized = {
-          id: raw.id || uid(),
-          title: String(raw.title || '').trim(),
-          subtitle: String(raw.subtitle || '').trim(),
-          authors: String(raw.authors || raw.author || '').trim(),
-          type: ['libro','revista','comic','otro'].includes(raw.type) ? raw.type : 'libro',
-          status: ['biblioteca','a-descubrir','va-y-vuelve'].includes(raw.status) ? raw.status : 'biblioteca',
-          publisher: String(raw.publisher || '').trim(),
-          genre: String(raw.genre || '').trim(),
-          year: String(raw.year || '').trim(),
-          decade: raw.decade || computeDecade(raw.year),
-          language: String(raw.language || parsed.defaults?.defaultLanguage || 'Español').trim() || 'Español',
-          guardian: String(raw.guardian || '').trim(),
-          notes: String(raw.notes || '').trim(),
-          cover: raw.cover || null,
-          isJoyita: !!raw.isJoyita,
-          joyitaOrder: raw.joyitaOrder ?? null,
-          createdAt: raw.createdAt || new Date().toISOString(),
-          updatedAt: raw.updatedAt || new Date().toISOString(),
-        };
-        if(normalized.title){
-          await putBook(normalized);
-        }
-      }
-
-      const defaults = parsed.defaults || {};
-      await saveDefaults({
-        defaultLanguage: defaults.defaultLanguage || 'Español',
-        defaultGuardian: defaults.defaultGuardian || ''
-      });
-
-      await refreshBooks();
-      renderCards();
-      toast('Biblioteca importada.');
-    }
-
-    function bindSearch(){
-      const handler = (event) => {
-        const value = event.target.value || '';
-        els.searchDesktop.value = value;
-        els.searchMobile.value = value;
-        state.search = value;
-        renderCards();
-      };
-      els.searchDesktop.addEventListener('input', handler);
-      els.searchMobile.addEventListener('input', handler);
-    }
-
-    function delegateClicks(){
-      document.addEventListener('click', async (event) => {
-        const viewBtn = event.target.closest('[data-view]');
-        if(viewBtn){
-          state.view = viewBtn.dataset.view;
-          renderCards();
-          return;
-        }
-
-        const sortBtn = event.target.closest('[data-sort]');
-        if(sortBtn){
-          state.sort = sortBtn.dataset.sort;
-          renderCards();
-          return;
-        }
-
-        const decadeBtn = event.target.closest('[data-decade]');
-        if(decadeBtn){
-          state.decade = decadeBtn.dataset.decade;
-          renderCards();
-          return;
-        }
-
-        const languageBtn = event.target.closest('[data-language]');
-        if(languageBtn){
-          state.language = languageBtn.dataset.language;
-          renderCards();
-          return;
-        }
-
-        const gemBtn = event.target.closest('[data-gem]');
-        if(gemBtn){
-          await toggleJoyita(gemBtn.dataset.gem);
-          return;
-        }
-
-        const editBtn = event.target.closest('[data-edit]');
-        if(editBtn){
-          const book = state.books.find(b => b.id === editBtn.dataset.edit);
-          if(book) openModal(book);
-          return;
-        }
-
-        const mobileViewBtn = event.target.closest('[data-mobile-view]');
-        if(mobileViewBtn){
-          state.view = mobileViewBtn.dataset.mobileView;
-          renderCards();
-          return;
-        }
-      });
-    }
-
-    function setupModals(){
-      els.fabAdd.addEventListener('click', () => openModal());
-      els.mobileAddBtn.addEventListener('click', () => openModal());
-      els.closeModalBtn.addEventListener('click', closeModal);
-      els.cancelModalBtn.addEventListener('click', closeModal);
-      els.deleteItemBtn.addEventListener('click', deleteCurrentBook);
-
-      els.bookModal.addEventListener('click', (event) => {
-        if(event.target === els.bookModal) closeModal();
-      });
-
-      els.openDefaultsBtn.addEventListener('click', openDefaults);
-      els.closeDefaultsBtn.addEventListener('click', closeDefaults);
-      els.defaultsModal.addEventListener('click', (event) => {
-        if(event.target === els.defaultsModal) closeDefaults();
-      });
-
-      els.saveDefaultsBtn.addEventListener('click', async () => {
-        await saveDefaults({
-          defaultLanguage: els.defaultLanguageInput.value || 'Español',
-          defaultGuardian: els.defaultGuardianInput.value.trim()
-        });
-        closeDefaults();
-      });
-
-      els.resetDefaultsBtn.addEventListener('click', () => {
-        els.defaultLanguageInput.value = 'Español';
-        els.defaultGuardianInput.value = '';
-      });
-
-      els.saveItemBtn.addEventListener('click', saveBookFromForm);
-      els.coverInput.addEventListener('change', async (event) => {
-        const file = event.target.files?.[0];
-        if(file) await handleCoverInput(file);
-        event.target.value = '';
-      });
-      els.removeCoverBtn.addEventListener('click', () => {
-        state.pendingCover = null;
-        updateCoverPreview();
-      });
-
-      els.mobileSearchToggle.addEventListener('click', () => {
-        const mobileSearch = document.querySelector('.mobile-search');
-        const display = getComputedStyle(mobileSearch).display;
-        mobileSearch.style.display = display === 'none' ? 'block' : 'none';
-        if(display === 'none') els.searchMobile.focus();
-      });
-    }
-
-    function setupImportExport(){
-      [els.exportBtnDesktop, els.exportBtnMain].forEach(btn => btn.addEventListener('click', exportJson));
-      [els.importBtnDesktop, els.importBtnMain].forEach(btn => btn.addEventListener('click', () => els.importFile.click()));
-      els.importFile.addEventListener('change', async (event) => {
-        const file = event.target.files?.[0];
-        if(!file) return;
-        try{
-          await importJson(file);
-        }catch(error){
-          console.error(error);
-          toast('No se pudo importar el JSON.');
-        }finally{
-          els.importFile.value = '';
-        }
-      });
-    }
-
-    function setupInstall(){
-      window.addEventListener('beforeinstallprompt', (event) => {
-        event.preventDefault();
-        state.deferredPrompt = event;
-        els.installBtnDesktop.hidden = false;
-      });
-      els.installBtnDesktop.addEventListener('click', async () => {
-        if(!state.deferredPrompt) return;
-        state.deferredPrompt.prompt();
-        await state.deferredPrompt.userChoice;
-        state.deferredPrompt = null;
-        els.installBtnDesktop.hidden = true;
-      });
-      window.addEventListener('appinstalled', () => {
-        els.installBtnDesktop.hidden = true;
-        toast('Xanadu instalada.');
-      });
-    }
-
-    async function registerSW(){
-      if('serviceWorker' in navigator){
-        try{
-          await navigator.serviceWorker.register('./sw.js');
-        }catch(error){
-          console.warn('No se pudo registrar el service worker', error);
-        }
-      }
-    }
-
-    async function seedExampleIfEmpty(){
-      if(state.books.length) return;
-      const sample = [
-        {
-          id: uid(), title:'1984', subtitle:'', authors:'George Orwell', type:'libro', status:'biblioteca',
-          publisher:'Debolsillo', genre:'Novela', year:'1984', decade:'1980', language:'Español',
-          guardian:'Casa', notes:'', cover:null, isJoyita:true, joyitaOrder:1,
-          createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()
-        },
-        {
-          id: uid(), title:'Watchmen', subtitle:'', authors:'Alan Moore y Dave Gibbons', type:'comic', status:'biblioteca',
-          publisher:'Planeta', genre:'Cómic', year:'2008', decade:'2000', language:'Español',
-          guardian:'Casa', notes:'', cover:null, isJoyita:false, joyitaOrder:null,
-          createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()
-        }
-      ];
-      for(const item of sample) await putBook(item);
-      state.defaults.defaultGuardian = 'Casa';
-      await putMeta('defaults', { defaultLanguage:'Español', defaultGuardian:'Casa' });
-      await refreshBooks();
-    }
-
-    async function init(){
-      state.db = await openDB();
-      await readDefaults();
-      await refreshBooks();
-      await seedExampleIfEmpty();
-      await readDefaults();
-
-      bindSearch();
-      delegateClicks();
-      setupModals();
-      setupImportExport();
-      setupInstall();
-      await registerSW();
-
-      renderCards();
-    }
-
-    init().catch(error => {
-      console.error(error);
-      document.body.innerHTML = `<div style="padding:24px;font-family:system-ui;">No se pudo iniciar Xanadu.</div>`;
+    els.imageInput.addEventListener('change', async e => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      pendingImage = await compressImage(file);
+      els.previewImg.src = pendingImage;
+      els.uploadPreview.style.display = 'block';
     });
+
+    els.itemForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = els.editingId.value || uid();
+      const original = books.find(b => b.id === id);
+      const guardian = document.getElementById('guardian').value.trim();
+      const book = {
+        id,
+        title: document.getElementById('title').value.trim(),
+        subtitle: document.getElementById('subtitle').value.trim(),
+        authors: document.getElementById('authors').value.trim(),
+        type: document.getElementById('type').value,
+        status: document.getElementById('status').value,
+        publisher: document.getElementById('publisher').value.trim(),
+        genre: document.getElementById('genre').value.trim(),
+        year: document.getElementById('year').value.trim(),
+        language: document.getElementById('language').value.trim() || 'Español',
+        guardian: guardian || (await storeGet(META, 'lastGuardian'))?.value || '',
+        notes: document.getElementById('notes').value.trim(),
+        image: pendingImage || original?.image || '',
+        isGem: document.getElementById('isGem').checked,
+        toDiscover: document.getElementById('toDiscover').checked,
+        loanedTo: original?.loanedTo || '',
+        loanHistory: original?.loanHistory || [],
+        createdAt: original?.createdAt || Date.now(),
+        updatedAt: Date.now()
+      };
+      if (!book.title) return;
+      if (book.guardian) await storePut(META, { key:'lastGuardian', value: book.guardian });
+      if (original) books = books.map(b => b.id === id ? book : b); else books.unshift(book);
+      await storePut(STORE, book);
+      closeItemModal();
+      state.view = book.status === 'Va y vuelve' ? 'Va y vuelve' : state.view;
+      render();
+    });
+
+    els.loanForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const book = books.find(b => b.id === loanTargetId);
+      if (!book) return;
+      const person = els.loanPerson.value.trim();
+      const note = els.loanNote.value.trim();
+      book.status = 'Va y vuelve';
+      book.loanedTo = person;
+      book.loanHistory = [{ date: new Date().toISOString(), action: 'Prestado', person, note }, ...(book.loanHistory || [])];
+      book.updatedAt = Date.now();
+      await persistBook(book);
+      els.loanDialog.close();
+      state.view = 'Va y vuelve';
+      render();
+    });
+
+    els.searchInput.addEventListener('input', e => { state.search = e.target.value; render(); });
+    els.addBtn.addEventListener('click', () => openItemModal());
+    els.mobileAddBtn.addEventListener('click', () => openItemModal());
+    els.closeModalBtn.addEventListener('click', closeItemModal);
+    els.cancelBtn.addEventListener('click', closeItemModal);
+    els.mobileSearchBtn.addEventListener('click', () => els.searchInput.focus());
+    els.mobileViewBtn.addEventListener('click', () => {
+      const idx = views.indexOf(state.view);
+      state.view = views[(idx + 1) % views.length];
+      render();
+    });
+
+    els.exportBtn.addEventListener('click', () => {
+      const payload = { app:'Xanadu', version:1, exportedAt:new Date().toISOString(), books };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `xanadu-export-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+    els.importBtn.addEventListener('click', () => els.importFile.click());
+    els.importFile.addEventListener('change', async e => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        const imported = Array.isArray(parsed) ? parsed : parsed.books;
+        if (!Array.isArray(imported)) throw new Error('Formato inválido');
+        if (!confirm('Esto va a reemplazar la biblioteca local de este navegador.')) return;
+        const current = await storeGetAll(STORE);
+        for (const item of current) await storeDelete(STORE, item.id);
+        books = imported.map(item => ({
+          id: item.id || uid(), title: item.title || '', subtitle: item.subtitle || '', authors: item.authors || '', type: item.type || 'Libro', status: item.status || 'Biblioteca', publisher: item.publisher || '', genre: item.genre || '', year: item.year || '', language: item.language || 'Español', guardian: item.guardian || '', notes: item.notes || '', image: item.image || '', isGem: !!item.isGem, toDiscover: !!item.toDiscover, loanedTo: item.loanedTo || '', loanHistory: Array.isArray(item.loanHistory) ? item.loanHistory : [], createdAt: item.createdAt || Date.now(), updatedAt: item.updatedAt || Date.now()
+        }));
+        for (const item of books) await storePut(STORE, item);
+        const guardian = books.map(b => b.guardian).filter(Boolean).at(-1);
+        if (guardian) await storePut(META, { key:'lastGuardian', value: guardian });
+        render();
+      } catch(err) { alert('No se pudo importar el JSON.'); console.error(err); }
+      e.target.value='';
+    });
+
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      els.installBtn.style.display = 'inline-block';
+    });
+    els.installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) { alert('La opción de instalar aparece cuando el navegador la habilita.'); return; }
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
+    }
+
+    (async function init(){
+      db = await openDb();
+      await seedIfEmpty();
+      books = await storeGetAll(STORE);
+      render();
+    })();
   </script>
 </body>
 </html>

@@ -1,30 +1,46 @@
 {
   "app": "Xanadu",
   "version": 1,
-  "defaults": {
-    "defaultLanguage": "Español",
-    "defaultGuardian": "Casa"
-  },
   "books": [
     {
-      "id": "sample-1",
+      "id": "demo-1984",
       "title": "1984",
       "subtitle": "",
       "authors": "George Orwell",
-      "type": "libro",
-      "status": "biblioteca",
+      "type": "Libro",
+      "status": "Biblioteca",
       "publisher": "Debolsillo",
       "genre": "Novela",
       "year": "1984",
-      "decade": "1980",
       "language": "Español",
-      "guardian": "Casa",
+      "guardian": "Luciano",
       "notes": "",
-      "cover": null,
-      "isJoyita": true,
-      "joyitaOrder": 1,
-      "createdAt": "2026-04-03T00:00:00.000Z",
-      "updatedAt": "2026-04-03T00:00:00.000Z"
+      "image": "",
+      "isGem": true,
+      "toDiscover": false,
+      "loanedTo": "",
+      "loanHistory": []
+    },
+    {
+      "id": "demo-watchmen",
+      "title": "Watchmen",
+      "subtitle": "",
+      "authors": "Alan Moore y Dave Gibbons",
+      "type": "Comic",
+      "status": "Va y vuelve",
+      "publisher": "Planeta",
+      "genre": "Novela gráfica",
+      "year": "2008",
+      "language": "Español",
+      "guardian": "Luciano",
+      "notes": "",
+      "image": "",
+      "isGem": false,
+      "toDiscover": true,
+      "loanedTo": "Juan",
+      "loanHistory": [
+        {"date": "2026-04-03T12:00:00.000Z", "action": "Prestado", "person": "Juan", "note": "Se lo lleva una semana"}
+      ]
     }
   ]
 }
