@@ -1,0 +1,21 @@
+{
+  "name": "Xanadu",
+  "short_name": "Xanadu",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ece0cf",
+  "theme_color": "#b46d2c",
+  "description": "Biblioteca offline-first para libros, revistas, cómics y otros ítems.",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

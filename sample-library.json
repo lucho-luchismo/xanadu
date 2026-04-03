@@ -1,0 +1,30 @@
+{
+  "app": "Xanadu",
+  "version": 1,
+  "defaults": {
+    "defaultLanguage": "Español",
+    "defaultGuardian": "Casa"
+  },
+  "books": [
+    {
+      "id": "sample-1",
+      "title": "1984",
+      "subtitle": "",
+      "authors": "George Orwell",
+      "type": "libro",
+      "status": "biblioteca",
+      "publisher": "Debolsillo",
+      "genre": "Novela",
+      "year": "1984",
+      "decade": "1980",
+      "language": "Español",
+      "guardian": "Casa",
+      "notes": "",
+      "cover": null,
+      "isJoyita": true,
+      "joyitaOrder": 1,
+      "createdAt": "2026-04-03T00:00:00.000Z",
+      "updatedAt": "2026-04-03T00:00:00.000Z"
+    }
+  ]
+}
