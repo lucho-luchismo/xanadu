@@ -3,31 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#ecdcca" />
+  <meta name="theme-color" content="#eadbc8" />
   <title>Xanadu</title>
   <link rel="manifest" href="manifest.json" />
   <style>
     :root{
       --bg:#efe1ce;
-      --paper:#f7ecdd;
-      --paper-2:#f2e5d4;
-      --card:#fbf3e7;
-      --ink:#3d2a1e;
-      --muted:#7d6858;
-      --line:rgba(112, 74, 42, .14);
-      --line-strong:rgba(112, 74, 42, .24);
-      --accent:#b96f34;
-      --accent-deep:#8d5327;
-      --accent-soft:#ecd7bf;
-      --ok:#70845e;
-      --danger:#9e4f3b;
-      --shadow:0 16px 40px rgba(69, 42, 22, .08);
-      --shadow-soft:0 10px 24px rgba(69, 42, 22, .05);
-      --sidebar:286px;
-      --r-xl:30px;
-      --r-lg:24px;
-      --r-md:18px;
-      --r-sm:14px;
+      --bg-2:#e9d7c0;
+      --paper:#f7ecdc;
+      --paper-2:#f3e6d5;
+      --card:#fbf4e9;
+      --card-2:#f7ecdc;
+      --ink:#3f2c20;
+      --muted:#7b6554;
+      --muted-2:#967d69;
+      --line:rgba(104,71,47,.12);
+      --line-strong:rgba(104,71,47,.22);
+      --accent:#ba7236;
+      --accent-deep:#8f5428;
+      --accent-soft:#ead6bf;
+      --gem:#9f6e3f;
+      --discover:#6e8064;
+      --loan:#8f6f4f;
+      --danger:#98503b;
+      --shadow:0 18px 42px rgba(67,43,25,.08);
+      --shadow-soft:0 10px 24px rgba(67,43,25,.05);
+      --sidebar:292px;
+      --r-xl:34px;
+      --r-lg:28px;
+      --r-md:22px;
+      --r-sm:16px;
     }
 
     *{box-sizing:border-box}
@@ -35,11 +40,11 @@
     body{
       margin:0;
       color:var(--ink);
-      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+      font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;
       background:
-        radial-gradient(circle at 10% 0%, rgba(255,255,255,.34), transparent 28%),
-        radial-gradient(circle at 100% 10%, rgba(255,255,255,.17), transparent 20%),
-        linear-gradient(180deg, #f1e4d2 0%, var(--bg) 100%);
+        radial-gradient(circle at 8% 0%, rgba(255,255,255,.38), transparent 28%),
+        radial-gradient(circle at 100% 10%, rgba(255,255,255,.18), transparent 24%),
+        linear-gradient(180deg, #f2e5d4 0%, var(--bg) 100%);
     }
 
     button,input,select,textarea{font:inherit;color:inherit}
@@ -49,16 +54,17 @@
       min-height:100vh;
       display:grid;
       grid-template-columns:var(--sidebar) 1fr;
-      gap:20px;
+      gap:22px;
       padding:18px;
     }
 
     .sidebar,.surface,.overlay-card,.mobile-bar{
       background:
-        linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,.16)),
+        linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,.14)),
         var(--paper);
       border:1px solid var(--line);
       box-shadow:var(--shadow);
+      backdrop-filter: blur(6px);
     }
 
     .sidebar{
@@ -67,32 +73,30 @@
       height:calc(100vh - 36px);
       overflow:auto;
       border-radius:var(--r-xl);
-      padding:22px 18px 18px;
+      padding:24px 18px 18px;
       display:flex;
       flex-direction:column;
-      gap:18px;
+      gap:20px;
     }
 
-    .brand-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding-bottom:8px;
+    .brand-wrap{
+      padding-bottom:10px;
       border-bottom:1px solid var(--line);
     }
 
     .brand{
       margin:0;
-      line-height:1;
-      font-size:2.2rem;
-      letter-spacing:-.045em;
+      font-size:2.35rem;
+      line-height:.95;
+      letter-spacing:-.06em;
       font-weight:700;
     }
 
     .sub-brand{
+      margin-top:6px;
       color:var(--muted);
-      font-size:.92rem;
+      font-size:.96rem;
+      line-height:1.3;
     }
 
     .block{display:grid;gap:10px}
@@ -101,36 +105,43 @@
       color:var(--muted);
       font-size:.9rem;
       font-weight:700;
-      letter-spacing:.02em;
+      letter-spacing:.04em;
+      text-transform:uppercase;
     }
 
     .search{
       width:100%;
       border:1px solid var(--line-strong);
-      background:rgba(255,255,255,.42);
-      border-radius:18px;
+      background:rgba(255,255,255,.46);
+      border-radius:20px;
       padding:14px 16px;
       outline:none;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.34);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.36);
+      transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+    .search:focus,.input:focus,.select:focus,.textarea:focus{
+      border-color:rgba(186,114,54,.38);
+      box-shadow:0 0 0 4px rgba(186,114,54,.08), inset 0 1px 0 rgba(255,255,255,.36);
+      background:rgba(255,255,255,.56);
     }
 
     .chips{display:flex;flex-wrap:wrap;gap:10px}
     .chip{
       border:1px solid var(--line-strong);
-      background:rgba(255,255,255,.36);
-      border-radius:16px;
+      background:rgba(255,255,255,.38);
+      border-radius:18px;
       padding:11px 14px;
       line-height:1;
       cursor:pointer;
       box-shadow:inset 0 1px 0 rgba(255,255,255,.28);
-      transition:transform .14s ease, background .14s ease, box-shadow .14s ease;
+      transition:transform .14s ease, box-shadow .14s ease, background .14s ease;
     }
     .chip:hover{transform:translateY(-1px)}
     .chip.active{
-      color:#fff9f1;
+      color:#fff9f2;
       border-color:transparent;
-      background:linear-gradient(180deg, #cd7b39 0%, var(--accent) 100%);
-      box-shadow:0 10px 18px rgba(185,111,52,.2);
+      background:linear-gradient(180deg, #ca7a39 0%, var(--accent) 100%);
+      box-shadow:0 12px 18px rgba(186,114,54,.2);
     }
 
     .content{
@@ -141,8 +152,8 @@
     }
 
     .surface{
-      border-radius:32px;
-      padding:20px;
+      border-radius:36px;
+      padding:22px;
     }
 
     .top-head{
@@ -154,61 +165,61 @@
     }
     .top-head h2{
       margin:0;
-      font-size:2.35rem;
-      line-height:1;
-      letter-spacing:-.05em;
+      font-size:2.7rem;
+      line-height:.95;
+      letter-spacing:-.07em;
+      font-weight:700;
     }
     .top-head p{
       margin:8px 0 0;
       color:var(--muted);
-      font-size:1rem;
+      font-size:1.02rem;
+      line-height:1.35;
+      max-width:50ch;
     }
     .count{
       color:var(--muted);
       font-size:1rem;
-      padding-top:4px;
+      padding-top:6px;
     }
 
     .toolbar{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      margin-top:16px;
+      margin-top:18px;
     }
 
-    .ghost-btn{
-      border:1px solid var(--line-strong);
-      background:rgba(255,255,255,.36);
-      border-radius:16px;
-      padding:11px 15px;
-      cursor:pointer;
+    .view-chip{
+      background:rgba(255,255,255,.52);
     }
 
     .grid{
       display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns:repeat(auto-fill, minmax(235px, 1fr));
       gap:18px;
     }
 
     .card{
       background:
-        linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,.14)),
+        linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.18)),
         var(--card);
-      border:1px solid rgba(112,74,42,.12);
-      border-radius:26px;
+      border:1px solid rgba(104,71,47,.11);
+      border-radius:28px;
       overflow:hidden;
       box-shadow:var(--shadow-soft);
       transition:transform .16s ease, box-shadow .16s ease;
       cursor:pointer;
     }
     .card:hover{
-      transform:translateY(-2px);
-      box-shadow:0 12px 28px rgba(69,42,22,.09);
+      transform:translateY(-3px);
+      box-shadow:0 14px 30px rgba(67,43,25,.09);
     }
 
     .cover{
-      aspect-ratio:.8;
-      background:linear-gradient(145deg, #e6d2bc, #d9bfa2);
+      aspect-ratio:.78;
+      background:
+        linear-gradient(145deg, #ead7c3, #dcc3a8);
       display:grid;
       place-items:center;
       overflow:hidden;
@@ -220,37 +231,46 @@
       object-fit:cover;
       display:block;
     }
+    .cover::after{
+      content:"";
+      position:absolute;
+      inset:auto 0 0 0;
+      height:28%;
+      background:linear-gradient(180deg, transparent, rgba(63,44,32,.06));
+      pointer-events:none;
+    }
     .cover-placeholder{
-      padding:22px;
+      padding:26px;
       text-align:center;
-      font-size:1.16rem;
-      line-height:1.2;
+      font-size:1.18rem;
+      line-height:1.18;
       font-weight:700;
-      color:#7a624d;
+      color:#7d654f;
+      letter-spacing:-.02em;
     }
 
     .card-body{
       display:grid;
-      gap:8px;
+      gap:9px;
       padding:16px 16px 18px;
     }
 
     .item-title{
       margin:0;
-      font-size:1.22rem;
-      line-height:1.12;
-      letter-spacing:-.02em;
+      font-size:1.24rem;
+      line-height:1.08;
+      letter-spacing:-.03em;
     }
     .item-subtitle{
       margin:-2px 0 0;
       color:var(--muted);
-      font-size:.96rem;
-      line-height:1.2;
+      font-size:.97rem;
+      line-height:1.22;
     }
     .item-authors{
       margin:0;
       font-size:1rem;
-      line-height:1.26;
+      line-height:1.28;
     }
 
     .badge,.loan-tag,.mark-btn{
@@ -259,28 +279,31 @@
       padding:6px 10px;
       line-height:1;
       font-size:.88rem;
-      border:1px solid rgba(112,74,42,.14);
-      background:rgba(255,255,255,.56);
+      border:1px solid rgba(104,71,47,.14);
+      background:rgba(255,255,255,.58);
     }
     .badge{font-weight:700}
     .status-badge{color:var(--accent-deep)}
+
     .meta,.notes,.history-preview{
       color:var(--muted);
       font-size:.95rem;
-      line-height:1.28;
-    }
-    .loan-tag{
-      color:var(--ok);
-      border-color:rgba(112,132,94,.24);
-      background:rgba(112,132,94,.09);
+      line-height:1.3;
     }
 
-    .marks-row,.bottom-row{
+    .loan-tag{
+      color:var(--loan);
+      border-color:rgba(143,111,79,.22);
+      background:rgba(143,111,79,.08);
+    }
+
+    .bottom-row{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
       flex-wrap:wrap;
+      margin-top:2px;
     }
     .mark-actions{display:flex;gap:8px;align-items:center}
     .mark-btn{
@@ -288,20 +311,27 @@
       background:transparent;
       min-width:38px;
       text-align:center;
+      transition:background .14s ease, color .14s ease, border-color .14s ease;
     }
     .mark-btn.active{
-      background:rgba(185,111,52,.11);
-      border-color:rgba(185,111,52,.2);
+      background:rgba(186,114,54,.11);
+      border-color:rgba(186,114,54,.2);
       color:var(--accent-deep);
+    }
+    .mark-btn.discover.active{
+      background:rgba(110,128,100,.12);
+      border-color:rgba(110,128,100,.24);
+      color:var(--discover);
     }
 
     .empty{
-      padding:54px 24px;
+      padding:58px 24px;
       text-align:center;
       color:var(--muted);
-      border-radius:24px;
+      border-radius:26px;
       border:1px dashed var(--line-strong);
-      background:rgba(255,255,255,.14);
+      background:rgba(255,255,255,.16);
+      font-size:1.02rem;
     }
 
     .fab{
@@ -316,7 +346,7 @@
       color:#fff9f1;
       font-size:2rem;
       cursor:pointer;
-      box-shadow:0 18px 34px rgba(185,111,52,.28);
+      box-shadow:0 18px 34px rgba(186,114,54,.28);
       z-index:20;
     }
 
@@ -333,10 +363,10 @@
     .overlay.active{display:flex}
 
     .overlay-card{
-      width:min(860px, 100%);
+      width:min(900px, 100%);
       max-height:calc(100vh - 36px);
       overflow:auto;
-      border-radius:34px;
+      border-radius:36px;
       padding:22px;
     }
 
@@ -351,92 +381,81 @@
     }
     .overlay-title{
       margin:0;
-      font-size:2rem;
-      letter-spacing:-.03em;
+      font-size:2.1rem;
+      letter-spacing:-.04em;
     }
     .close-btn{
       border:none;
       background:transparent;
       color:var(--muted);
-      font-size:1.9rem;
+      font-size:1.95rem;
       line-height:1;
       cursor:pointer;
     }
 
     .detail-layout{
       display:grid;
-      grid-template-columns:minmax(220px,270px) 1fr;
-      gap:22px;
+      grid-template-columns:minmax(220px,280px) 1fr;
+      gap:24px;
       align-items:start;
     }
     .detail-cover{
       width:100%;
       aspect-ratio:.78;
-      border-radius:24px;
+      border-radius:26px;
       overflow:hidden;
       background:linear-gradient(145deg, #e6d2bc, #d9bfa2);
       box-shadow:var(--shadow-soft);
     }
     .detail-cover img{width:100%;height:100%;object-fit:cover;display:block}
     .detail-placeholder{
-      width:100%;height:100%;
-      display:grid;place-items:center;
-      padding:22px;text-align:center;
-      color:#7a624d;font-weight:700;font-size:1.2rem;
+      width:100%;height:100%;display:grid;place-items:center;
+      padding:24px;text-align:center;color:#7a624d;font-weight:700;font-size:1.2rem;
     }
-    .detail-body{display:grid;gap:12px}
+    .detail-body{display:grid;gap:13px}
     .detail-title{
       margin:0;
-      font-size:2.2rem;
-      line-height:1;
-      letter-spacing:-.045em;
+      font-size:2.35rem;
+      line-height:.96;
+      letter-spacing:-.06em;
     }
     .detail-subtitle{
-      margin:4px 0 0;
+      margin:6px 0 0;
       color:var(--muted);
-      font-size:1.08rem;
+      font-size:1.1rem;
+      line-height:1.24;
     }
     .detail-authors{
       margin:8px 0 0;
       font-size:1.08rem;
-      line-height:1.3;
+      line-height:1.32;
     }
-    .detail-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px 12px;
-      align-items:center;
-    }
+    .detail-row{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center}
     .detail-meta{
       color:var(--muted);
       font-size:1rem;
-      line-height:1.35;
+      line-height:1.38;
     }
 
     .detail-block{
-      background:rgba(255,255,255,.28);
+      background:rgba(255,255,255,.3);
       border:1px solid var(--line);
-      border-radius:20px;
-      padding:14px 15px;
+      border-radius:22px;
+      padding:15px 16px;
       display:grid;
       gap:8px;
     }
     .detail-block h4{
       margin:0;
       font-size:1rem;
+      letter-spacing:-.01em;
     }
 
-    .history-list{
-      list-style:none;
-      margin:0;
-      padding:0;
-      display:grid;
-      gap:8px;
-    }
+    .history-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
     .history-item{
       padding:10px 12px;
-      border-radius:14px;
-      background:rgba(255,255,255,.34);
+      border-radius:15px;
+      background:rgba(255,255,255,.36);
       border:1px solid var(--line);
       color:var(--muted);
     }
@@ -453,23 +472,23 @@
     .input,.select,.textarea{
       width:100%;
       border:1px solid var(--line-strong);
-      background:rgba(255,255,255,.45);
-      border-radius:16px;
+      background:rgba(255,255,255,.48);
+      border-radius:18px;
       padding:13px 14px;
       outline:none;
     }
-    .textarea{min-height:90px;resize:vertical}
+    .textarea{min-height:94px;resize:vertical}
 
     .upload{
       display:grid;
       gap:10px;
-      padding:14px;
-      border-radius:20px;
+      padding:15px;
+      border-radius:22px;
       border:1px dashed var(--line-strong);
       background:rgba(255,255,255,.28);
     }
     .upload-preview{
-      width:116px;
+      width:118px;
       aspect-ratio:.78;
       border-radius:18px;
       overflow:hidden;
@@ -487,7 +506,7 @@
     }
     .primary-btn,.secondary-btn,.danger-btn{
       border:none;
-      border-radius:16px;
+      border-radius:18px;
       padding:12px 16px;
       cursor:pointer;
     }
@@ -496,13 +515,13 @@
       color:#fff9f1;
     }
     .secondary-btn{
-      background:rgba(255,255,255,.36);
+      background:rgba(255,255,255,.38);
       border:1px solid var(--line-strong);
     }
     .danger-btn{
-      background:rgba(158,79,59,.1);
-      border:1px solid rgba(158,79,59,.2);
-      color:#8e4432;
+      background:rgba(152,80,59,.1);
+      border:1px solid rgba(152,80,59,.2);
+      color:var(--danger);
     }
 
     .mobile-bar{
@@ -521,7 +540,7 @@
     .mobile-btn{
       border:1px solid var(--line-strong);
       background:rgba(255,255,255,.4);
-      border-radius:15px;
+      border-radius:16px;
       padding:12px 14px;
       cursor:pointer;
       text-align:center;
@@ -533,36 +552,38 @@
       color:#fff9f1;font-size:1.7rem;
     }
 
-    @media (max-width: 1020px){
+    @media (max-width:1020px){
       .app{grid-template-columns:1fr}
       .sidebar{display:none}
       .mobile-bar{display:grid}
       .fab{bottom:80px}
     }
 
-    @media (max-width: 760px){
+    @media (max-width:760px){
       .app{padding:12px}
       .surface,.overlay-card{padding:16px;border-radius:28px}
       .top-head{flex-direction:column}
-      .grid{grid-template-columns:repeat(auto-fill, minmax(170px, 1fr))}
+      .grid{grid-template-columns:repeat(auto-fill, minmax(176px, 1fr))}
       .detail-layout{grid-template-columns:1fr}
-      .detail-cover{max-width:270px}
+      .detail-cover{max-width:280px}
       .row.cols-2{grid-template-columns:1fr}
+      .top-head h2{font-size:2.2rem}
+      .detail-title{font-size:1.95rem}
     }
 
-    @media (max-width: 460px){
+    @media (max-width:460px){
       .grid{grid-template-columns:1fr}
+      .toolbar{margin-top:14px}
       .top-head h2{font-size:2rem}
-      .detail-title{font-size:1.8rem}
     }
   </style>
 </head>
 <body>
   <div class="app">
     <aside class="sidebar">
-      <div class="brand-row">
+      <div class="brand-wrap">
         <h1 class="brand">Xanadu</h1>
-        <span class="sub-brand">biblioteca local</span>
+        <div class="sub-brand">biblioteca local, cálida y offline</div>
       </div>
 
       <div class="block">
@@ -609,7 +630,7 @@
           <div class="count" id="countLabel">0 ítems</div>
         </div>
         <div class="toolbar">
-          <span class="chip active" id="currentViewChip">Biblioteca</span>
+          <span class="chip active view-chip" id="currentViewChip">Biblioteca</span>
         </div>
       </section>
 
@@ -774,13 +795,7 @@
     const DECADES = ["Todas", "2020", "2010", "2000", "1990", "1980"];
     const LANGS = ["Todos", "ES", "EN", "FR", "Otros"];
 
-    const state = {
-      view: "Biblioteca",
-      sort: "Recientes",
-      decade: "Todas",
-      language: "Todos",
-      search: ""
-    };
+    const state = { view:"Biblioteca", sort:"Recientes", decade:"Todas", language:"Todos", search:"" };
 
     const els = {
       viewGroup: document.getElementById("viewGroup"),
@@ -835,94 +850,14 @@
     let pendingImage = "";
     let selectedId = null;
 
-    function uid() {
-      return "id-" + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    }
+    function uid(){ return "id-" + Math.random().toString(36).slice(2) + Date.now().toString(36); }
+    function compact(arr){ return arr.filter(Boolean); }
+    function norm(v){ return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim(); }
+    function decadeOf(year){ const n=parseInt(year,10); return n ? String(Math.floor(n/10)*10) : ""; }
+    function languageCode(v){ const x=norm(v); if(!x) return "Otros"; if(x.startsWith("es")||x.includes("castell")) return "ES"; if(x.startsWith("en")||x.includes("ingles")) return "EN"; if(x.startsWith("fr")||x.includes("frances")) return "FR"; return "Otros"; }
+    function fmtDate(ts){ return new Date(ts||Date.now()).toLocaleDateString("es-AR"); }
 
-    function compact(arr) { return arr.filter(Boolean); }
-
-    function escapeHtml(v) {
-      return String(v || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function norm(v) {
-      return String(v || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .trim();
-    }
-
-    function decadeOf(year) {
-      const n = parseInt(year, 10);
-      if (!n) return "";
-      return String(Math.floor(n / 10) * 10);
-    }
-
-    function languageCode(v) {
-      const x = norm(v);
-      if (!x) return "Otros";
-      if (x.startsWith("es") || x.includes("castell")) return "ES";
-      if (x.startsWith("en") || x.includes("ingles")) return "EN";
-      if (x.startsWith("fr") || x.includes("frances")) return "FR";
-      return "Otros";
-    }
-
-    function fmtDate(ts) {
-      return new Date(ts || Date.now()).toLocaleDateString("es-AR");
-    }
-
-    function defaultBooks() {
-      return [
-        {
-          id: uid(),
-          title: "Watchmen",
-          subtitle: "",
-          authors: "Alan Moore y Dave Gibbons",
-          type: "Comic",
-          status: "Biblioteca",
-          publisher: "Planeta",
-          genre: "Novela gráfica",
-          year: "2008",
-          language: "Español",
-          guardian: "Luciano",
-          notes: "",
-          image: "",
-          isGem: false,
-          discover: false,
-          createdAt: Date.now() - 20000,
-          loanedTo: "",
-          loanHistory: []
-        },
-        {
-          id: uid(),
-          title: "1984",
-          subtitle: "",
-          authors: "George Orwell",
-          type: "Libro",
-          status: "Biblioteca",
-          publisher: "Debolsillo",
-          genre: "Novela",
-          year: "1984",
-          language: "Español",
-          guardian: "Luciano",
-          notes: "",
-          image: "",
-          isGem: false,
-          discover: true,
-          createdAt: Date.now() - 10000,
-          loanedTo: "",
-          loanHistory: []
-        }
-      ];
-    }
-
-    function sanitizeBook(raw) {
+    function sanitizeBook(raw){
       const book = { ...raw };
       book.id = String(book.id || uid());
       book.title = String(book.title || "").trim();
@@ -942,94 +877,83 @@
       book.createdAt = Number(book.createdAt || Date.now());
       book.loanedTo = String(book.loanedTo || "").trim();
       const history = Array.isArray(book.loanHistory) ? book.loanHistory : [];
-      book.loanHistory = history
-        .map(entry => ({
-          to: String(entry.to || entry.loanedTo || "").trim(),
-          date: Number(entry.date || Date.now())
-        }))
-        .filter(entry => entry.to);
+      book.loanHistory = history.map(entry => ({ to:String(entry.to || entry.loanedTo || "").trim(), date:Number(entry.date || Date.now()) })).filter(entry => entry.to);
       return book;
     }
 
-    function loadBooks() {
-      for (const key of STORAGE_KEYS) {
-        try {
+    function defaultBooks(){
+      return [
+        { id:uid(), title:"Watchmen", subtitle:"", authors:"Alan Moore y Dave Gibbons", type:"Comic", status:"Biblioteca", publisher:"Planeta", genre:"Novela gráfica", year:"2008", language:"Español", guardian:"Luciano", notes:"", image:"", isGem:false, discover:false, createdAt:Date.now()-20000, loanedTo:"", loanHistory:[] },
+        { id:uid(), title:"1984", subtitle:"", authors:"George Orwell", type:"Libro", status:"Biblioteca", publisher:"Debolsillo", genre:"Novela", year:"1984", language:"Español", guardian:"Luciano", notes:"", image:"", isGem:false, discover:true, createdAt:Date.now()-10000, loanedTo:"", loanHistory:[] }
+      ];
+    }
+
+    function loadBooks(){
+      for(const key of STORAGE_KEYS){
+        try{
           const raw = localStorage.getItem(key);
-          if (!raw) continue;
+          if(!raw) continue;
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) return parsed.map(sanitizeBook);
-          if (Array.isArray(parsed.books)) return parsed.books.map(sanitizeBook);
-        } catch {}
+          if(Array.isArray(parsed)) return parsed.map(sanitizeBook);
+          if(Array.isArray(parsed.books)) return parsed.books.map(sanitizeBook);
+        }catch{}
       }
       return defaultBooks();
     }
 
-    function saveBooks() {
-      localStorage.setItem(STORAGE_KEYS[0], JSON.stringify({ books }));
+    function saveBooks(){ localStorage.setItem(STORAGE_KEYS[0], JSON.stringify({ books })); }
+
+    function renderChipSet(container, items, active, onSelect){
+      container.innerHTML = items.map(item => `<button class="chip ${item===active?"active":""}" type="button" data-value="${item}">${item}</button>`).join("");
+      [...container.querySelectorAll("button")].forEach(btn => btn.addEventListener("click", () => onSelect(btn.dataset.value)));
     }
 
-    function renderChipSet(container, items, active, onSelect) {
-      container.innerHTML = items.map(item => `
-        <button class="chip ${item === active ? "active" : ""}" type="button" data-value="${item}">
-          ${item}
-        </button>
-      `).join("");
-      [...container.querySelectorAll("button")].forEach(btn => {
-        btn.addEventListener("click", () => onSelect(btn.dataset.value));
-      });
-    }
-
-    function visibleBooks() {
+    function visibleBooks(){
       let list = books.filter(book => {
-        if (state.view === "Joyitas") return !!book.isGem;
-        if (state.view === "A descubrir") return !!book.discover;
-        if (state.view === "Va y vuelve") return book.status === "Va y vuelve";
+        if(state.view === "Joyitas") return !!book.isGem;
+        if(state.view === "A descubrir") return !!book.discover;
+        if(state.view === "Va y vuelve") return book.status === "Va y vuelve";
         return book.status === "Biblioteca";
       });
-
-      if (state.decade !== "Todas") list = list.filter(book => decadeOf(book.year) === state.decade);
-      if (state.language !== "Todos") list = list.filter(book => languageCode(book.language) === state.language);
-      if (state.search) {
+      if(state.decade !== "Todas") list = list.filter(book => decadeOf(book.year) === state.decade);
+      if(state.language !== "Todos") list = list.filter(book => languageCode(book.language) === state.language);
+      if(state.search){
         const q = norm(state.search);
-        list = list.filter(book => norm([
-          book.title, book.subtitle, book.authors, book.publisher, book.genre,
-          book.language, book.guardian, book.notes, book.loanedTo, book.year
-        ].join(" ")).includes(q));
+        list = list.filter(book => norm([book.title,book.subtitle,book.authors,book.publisher,book.genre,book.language,book.guardian,book.notes,book.loanedTo,book.year].join(" ")).includes(q));
       }
-
       list = list.slice();
-      if (state.sort === "Recientes") list.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
-      if (state.sort === "Año") list.sort((a,b) => Number(b.year || 0) - Number(a.year || 0));
-      if (state.sort === "Autor") list.sort((a,b) => (a.authors || "").localeCompare(b.authors || "", "es"));
+      if(state.sort === "Recientes") list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+      if(state.sort === "Año") list.sort((a,b)=>Number(b.year||0)-Number(a.year||0));
+      if(state.sort === "Autor") list.sort((a,b)=>(a.authors||"").localeCompare(b.authors||"","es"));
       return list;
     }
 
-    function subtitleForView() {
-      if (state.view === "Joyitas") return "Selección curada manualmente.";
-      if (state.view === "A descubrir") return "Libros y materiales para seguir de cerca.";
-      if (state.view === "Va y vuelve") return "Ítems prestados y su memoria de circulación.";
-      if (state.sort === "Año") return "Ordenados por año.";
-      if (state.sort === "Autor") return "Ordenados por autor.";
+    function subtitleForView(){
+      if(state.view === "Joyitas") return "Selección curada manualmente.";
+      if(state.view === "A descubrir") return "Libros y materiales para seguir de cerca.";
+      if(state.view === "Va y vuelve") return "Ítems prestados y su memoria de circulación.";
+      if(state.sort === "Año") return "Ordenados por año.";
+      if(state.sort === "Autor") return "Ordenados por autor.";
       return "Últimos añadidos primero.";
     }
 
-    function render() {
-      renderChipSet(els.viewGroup, VIEWS, state.view, value => { state.view = value; render(); });
-      renderChipSet(els.sortGroup, SORTS, state.sort, value => { state.sort = value; render(); });
-      renderChipSet(els.decadeGroup, DECADES, state.decade, value => { state.decade = value; render(); });
-      renderChipSet(els.languageGroup, LANGS, state.language, value => { state.language = value; render(); });
+    function render(){
+      renderChipSet(els.viewGroup, VIEWS, state.view, value => { state.view=value; render(); });
+      renderChipSet(els.sortGroup, SORTS, state.sort, value => { state.sort=value; render(); });
+      renderChipSet(els.decadeGroup, DECADES, state.decade, value => { state.decade=value; render(); });
+      renderChipSet(els.languageGroup, LANGS, state.language, value => { state.language=value; render(); });
 
       const list = visibleBooks();
       els.screenTitle.textContent = state.view;
       els.screenSubtitle.textContent = subtitleForView();
       els.currentViewChip.textContent = state.view;
       els.mobileViewBtn.textContent = state.view;
-      els.countLabel.textContent = `${list.length} ítem${list.length === 1 ? "" : "s"}`;
+      els.countLabel.textContent = `${list.length} ítem${list.length===1?"":"s"}`;
 
       els.cardsGrid.innerHTML = list.map(book => `
         <article class="card" data-open="${book.id}">
           <div class="cover">
-            ${book.image ? `<img src="${book.image}" alt="${escapeHtml(book.title)}">` : `<div class="cover-placeholder">${escapeHtml(book.title)}</div>`}
+            ${book.image ? `<img src="${book.image}" alt="${book.title.replace(/"/g,"&quot;")}">` : `<div class="cover-placeholder">${escapeHtml(book.title)}</div>`}
           </div>
           <div class="card-body">
             <h3 class="item-title">${escapeHtml(book.title)}</h3>
@@ -1043,7 +967,7 @@
             <div class="bottom-row">
               <div class="mark-actions">
                 <button type="button" class="mark-btn ${book.isGem ? "active" : ""}" data-gem="${book.id}">💎</button>
-                <button type="button" class="mark-btn ${book.discover ? "active" : ""}" data-discover="${book.id}">🧭</button>
+                <button type="button" class="mark-btn discover ${book.discover ? "active" : ""}" data-discover="${book.id}">🧭</button>
               </div>
               <div class="badge status-badge">${escapeHtml(book.status)}</div>
             </div>
@@ -1056,10 +980,10 @@
       saveBooks();
     }
 
-    function bindCardEvents() {
+    function bindCardEvents(){
       [...document.querySelectorAll("[data-open]")].forEach(card => {
         card.addEventListener("click", e => {
-          if (e.target.closest("[data-gem]") || e.target.closest("[data-discover]")) return;
+          if(e.target.closest("[data-gem]") || e.target.closest("[data-discover]")) return;
           openDetail(card.dataset.open);
         });
       });
@@ -1068,8 +992,8 @@
         btn.addEventListener("click", e => {
           e.stopPropagation();
           const book = books.find(b => b.id === btn.dataset.gem);
-          if (!book) return;
-          if (!book.isGem && books.filter(x => x.isGem).length >= 12) {
+          if(!book) return;
+          if(!book.isGem && books.filter(x => x.isGem).length >= 12){
             alert("Joyitas tiene un límite blando de 12. Sacá una antes de agregar otra.");
             return;
           }
@@ -1082,24 +1006,19 @@
         btn.addEventListener("click", e => {
           e.stopPropagation();
           const book = books.find(b => b.id === btn.dataset.discover);
-          if (!book) return;
+          if(!book) return;
           book.discover = !book.discover;
           render();
         });
       });
     }
 
-    function setValue(id, value) {
-      document.getElementById(id).value = value || "";
-    }
+    function setValue(id, value){ document.getElementById(id).value = value || ""; }
+    function toggleLoanField(){ els.loanToField.classList.toggle("hidden", els.status.value !== "Va y vuelve"); }
 
-    function toggleLoanField() {
-      els.loanToField.classList.toggle("hidden", els.status.value !== "Va y vuelve");
-    }
-
-    function openForm(book = null) {
+    function openForm(book = null){
       els.formOverlay.classList.add("active");
-      if (!book) {
+      if(!book){
         els.formTitle.textContent = "Agregar";
         els.itemForm.reset();
         els.editingId.value = "";
@@ -1126,82 +1045,57 @@
       setValue("loanedTo", book.loanedTo || "");
       setValue("notes", book.notes);
       pendingImage = book.image || "";
-      if (pendingImage) {
-        els.previewImg.src = pendingImage;
-        els.uploadPreview.style.display = "block";
-      } else {
-        els.uploadPreview.style.display = "none";
-      }
+      if(pendingImage){ els.previewImg.src = pendingImage; els.uploadPreview.style.display = "block"; }
+      else { els.uploadPreview.style.display = "none"; }
       toggleLoanField();
     }
 
-    function closeForm() {
-      els.formOverlay.classList.remove("active");
-    }
+    function closeForm(){ els.formOverlay.classList.remove("active"); }
+    function closeDetail(){ els.detailOverlay.classList.remove("active"); selectedId = null; }
 
-    function closeDetail() {
-      els.detailOverlay.classList.remove("active");
-      selectedId = null;
-    }
-
-    function openDetail(id) {
+    function openDetail(id){
       const book = books.find(b => b.id === id);
-      if (!book) return;
+      if(!book) return;
       selectedId = id;
       els.detailOverlay.classList.add("active");
-
-      els.detailCover.innerHTML = book.image
-        ? `<img src="${book.image}" alt="${escapeHtml(book.title)}">`
-        : `<div class="detail-placeholder">${escapeHtml(book.title)}</div>`;
-
+      els.detailCover.innerHTML = book.image ? `<img src="${book.image}" alt="${book.title.replace(/"/g,"&quot;")}">` : `<div class="detail-placeholder">${escapeHtml(book.title)}</div>`;
       els.detailTitle.textContent = book.title || "";
-      if (book.subtitle) {
-        els.detailSubtitle.textContent = book.subtitle;
-        els.detailSubtitle.classList.remove("hidden");
-      } else {
-        els.detailSubtitle.classList.add("hidden");
-      }
+      if(book.subtitle){ els.detailSubtitle.textContent = book.subtitle; els.detailSubtitle.classList.remove("hidden"); }
+      else { els.detailSubtitle.classList.add("hidden"); }
       els.detailAuthors.textContent = book.authors || "";
-
       els.detailBadges.innerHTML = `
         <span class="badge">${escapeHtml(book.type)}</span>
         ${book.isGem ? `<span class="badge status-badge">💎 Joyita</span>` : ""}
         ${book.discover ? `<span class="badge status-badge">🧭 A descubrir</span>` : ""}
         <span class="badge status-badge">${escapeHtml(book.status)}</span>
       `;
-
-      els.detailMeta.textContent = compact([
-        book.publisher, book.genre, book.year, book.language,
-        book.guardian ? `Guardián: ${book.guardian}` : ""
-      ]).join(" · ");
-
+      els.detailMeta.textContent = compact([book.publisher, book.genre, book.year, book.language, book.guardian ? `Guardián: ${book.guardian}` : ""]).join(" · ");
       els.detailNotes.textContent = book.notes || "Sin notas.";
-
-      const showLoanBlock = (book.loanHistory && book.loanHistory.length) || book.status === "Va y vuelve" || book.loanedTo;
-      els.detailLoanBlock.classList.toggle("hidden", !showLoanBlock);
+      const showLoan = (book.loanHistory && book.loanHistory.length) || book.status === "Va y vuelve" || book.loanedTo;
+      els.detailLoanBlock.classList.toggle("hidden", !showLoan);
       els.detailLoanCurrent.textContent = book.status === "Va y vuelve"
         ? (book.loanedTo ? `Actualmente prestado a ${book.loanedTo}.` : "Está en va y vuelve, sin destinatario cargado.")
         : "Actualmente no está prestado.";
       els.detailHistory.innerHTML = (book.loanHistory && book.loanHistory.length)
-        ? book.loanHistory.map(entry => `<li class="history-item">${escapeHtml(entry.to)} · ${escapeHtml(fmtDate(entry.date))}</li>`).join("")
+        ? book.loanHistory.map(entry => `<li class="history-item">${escapeHtml(entry.to)} · ${escapeHtml(new Date(entry.date).toLocaleDateString("es-AR"))}</li>`).join("")
         : `<li class="history-item">Sin historial todavía.</li>`;
     }
 
-    function addLoanHistory(book, to) {
-      if (!to) return;
-      if (!Array.isArray(book.loanHistory)) book.loanHistory = [];
+    function addLoanHistory(book, to){
+      if(!to) return;
+      if(!Array.isArray(book.loanHistory)) book.loanHistory = [];
       book.loanHistory.unshift({ to, date: Date.now() });
     }
 
-    function toggleLoanFromDetail() {
+    function toggleLoanFromDetail(){
       const book = books.find(b => b.id === selectedId);
-      if (!book) return;
-      if (book.status === "Va y vuelve") {
+      if(!book) return;
+      if(book.status === "Va y vuelve"){
         book.status = "Biblioteca";
         book.loanedTo = "";
       } else {
         const to = prompt("¿A quién se presta?");
-        if (to === null) return;
+        if(to === null) return;
         const clean = to.trim();
         book.status = "Va y vuelve";
         book.loanedTo = clean;
@@ -1211,16 +1105,16 @@
       openDetail(book.id);
     }
 
-    function deleteSelected() {
+    function deleteSelected(){
       const book = books.find(b => b.id === selectedId);
-      if (!book) return;
-      if (!confirm(`¿Borrar "${book.title}"?`)) return;
+      if(!book) return;
+      if(!confirm(`¿Borrar "${book.title}"?`)) return;
       books = books.filter(b => b.id !== selectedId);
       closeDetail();
       render();
     }
 
-    async function fileToDataURL(file) {
+    async function fileToDataURL(file){
       return await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
@@ -1231,7 +1125,7 @@
 
     els.imageInput.addEventListener("change", async e => {
       const file = e.target.files?.[0];
-      if (!file) return;
+      if(!file) return;
       pendingImage = await fileToDataURL(file);
       els.previewImg.src = pendingImage;
       els.uploadPreview.style.display = "block";
@@ -1244,8 +1138,7 @@
       const existing = books.find(b => b.id === els.editingId.value);
       const status = els.status.value;
       const loanedTo = (els.loanedTo.value || "").trim();
-      const book = existing ? { ...existing } : { id: uid(), isGem: false, discover: false, loanHistory: [], createdAt: Date.now() };
-
+      const book = existing ? { ...existing } : { id: uid(), isGem:false, discover:false, loanHistory:[], createdAt:Date.now() };
       book.title = document.getElementById("title").value.trim();
       book.subtitle = document.getElementById("subtitle").value.trim();
       book.authors = document.getElementById("authors").value.trim();
@@ -1262,64 +1155,47 @@
       const prevStatus = existing?.status || "";
       const prevLoanedTo = existing?.loanedTo || "";
 
-      if (status === "Va y vuelve") {
+      if(status === "Va y vuelve"){
         book.loanedTo = loanedTo;
-        if ((!existing && loanedTo) || (prevStatus !== "Va y vuelve" && loanedTo) || (prevStatus === "Va y vuelve" && loanedTo && loanedTo !== prevLoanedTo)) {
+        if((!existing && loanedTo) || (prevStatus !== "Va y vuelve" && loanedTo) || (prevStatus === "Va y vuelve" && loanedTo && loanedTo !== prevLoanedTo)){
           addLoanHistory(book, loanedTo);
         }
       } else {
         book.loanedTo = "";
       }
 
-      if (!book.title) return;
-
+      if(!book.title) return;
       lastGuardian = book.guardian || lastGuardian;
 
-      if (existing) {
-        books = books.map(b => b.id === book.id ? sanitizeBook(book) : b);
-      } else {
-        books.unshift(sanitizeBook(book));
-      }
+      if(existing) books = books.map(b => b.id === book.id ? sanitizeBook(book) : b);
+      else books.unshift(sanitizeBook(book));
 
       closeForm();
       render();
-      if (selectedId === book.id) openDetail(book.id);
+      if(selectedId === book.id) openDetail(book.id);
     });
 
     els.addBtn.addEventListener("click", () => openForm());
     els.mobileAddBtn.addEventListener("click", () => openForm());
     els.closeFormBtn.addEventListener("click", closeForm);
     els.cancelFormBtn.addEventListener("click", closeForm);
-
     els.closeDetailBtn.addEventListener("click", closeDetail);
     els.editBtn.addEventListener("click", () => {
       const book = books.find(b => b.id === selectedId);
-      if (!book) return;
+      if(!book) return;
       closeDetail();
       openForm(book);
     });
     els.toggleLoanBtn.addEventListener("click", toggleLoanFromDetail);
     els.deleteBtn.addEventListener("click", deleteSelected);
 
-    els.searchInput.addEventListener("input", e => {
-      state.search = e.target.value;
-      render();
-    });
-
-    els.mobileSearchBtn.addEventListener("click", () => {
-      els.searchInput.focus();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-
-    els.mobileViewBtn.addEventListener("click", () => {
-      const idx = VIEWS.indexOf(state.view);
-      state.view = VIEWS[(idx + 1) % VIEWS.length];
-      render();
-    });
+    els.searchInput.addEventListener("input", e => { state.search = e.target.value; render(); });
+    els.mobileSearchBtn.addEventListener("click", () => { els.searchInput.focus(); window.scrollTo({ top:0, behavior:"smooth" }); });
+    els.mobileViewBtn.addEventListener("click", () => { const idx = VIEWS.indexOf(state.view); state.view = VIEWS[(idx + 1) % VIEWS.length]; render(); });
 
     els.exportBtn.addEventListener("click", () => {
-      const payload = { books, exportedAt: new Date().toISOString() };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const payload = { books, exportedAt:new Date().toISOString() };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type:"application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = "xanadu-export.json";
@@ -1330,29 +1206,26 @@
     els.importBtn.addEventListener("click", () => els.importFile.click());
     els.importFile.addEventListener("change", async e => {
       const file = e.target.files?.[0];
-      if (!file) return;
-      try {
+      if(!file) return;
+      try{
         const text = await file.text();
         const data = JSON.parse(text);
         const imported = Array.isArray(data) ? data : data.books;
-        if (!Array.isArray(imported)) throw new Error("Formato inválido");
+        if(!Array.isArray(imported)) throw new Error("Formato inválido");
         books = imported.map(sanitizeBook).filter(book => book.title);
         saveBooks();
         render();
-      } catch (err) {
+      }catch{
         alert("No se pudo importar el JSON.");
       }
       e.target.value = "";
     });
 
     window.addEventListener("keydown", e => {
-      if (e.key === "Escape") {
-        closeForm();
-        closeDetail();
-      }
+      if(e.key === "Escape"){ closeForm(); closeDetail(); }
     });
 
-    if ("serviceWorker" in navigator) {
+    if("serviceWorker" in navigator){
       window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
     }
 
