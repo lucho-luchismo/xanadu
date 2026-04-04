@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#a8672f" />
+  <title>Xanadu</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="theme.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-wrap">
+        <h1 class="brand">Xanadu</h1>
+      </div>
+      <div class="topbar-actions">
+        <button id="settingsButton" class="icon-button" type="button" aria-label="Configuración">⚙</button>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <aside class="sidebar desktop-only">
+        <div class="panel search-panel">
+          <label class="search-input-wrap" for="searchInputDesktop">
+            <span class="search-icon">⌕</span>
+            <input id="searchInputDesktop" class="search-input" type="search" placeholder="Buscar..." autocomplete="off" />
+          </label>
+        </div>
+
+        <div class="panel filter-panel">
+          <div class="filter-group">
+            <div class="filter-title">Estado:</div>
+            <div id="statusFiltersDesktop" class="check-list"></div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-title">Década:</div>
+            <div id="decadeFiltersDesktop" class="check-list"></div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-title">Idioma:</div>
+            <div id="languageFiltersDesktop" class="chip-group"></div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content-area">
+        <section class="panel content-panel">
+          <nav class="tabs desktop-tabs" aria-label="Secciones">
+            <button class="tab-button active" data-view="library">📚 Biblioteca</button>
+            <button class="tab-button" data-view="gems">💎 Joyitas</button>
+            <button class="tab-button" data-view="discover">🧭 A descubrir</button>
+            <button class="tab-button" data-view="loans">👜 Va y vuelve</button>
+          </nav>
+
+          <div class="mobile-toolbar mobile-only">
+            <nav class="tabs mobile-tabs" aria-label="Secciones móvil">
+              <button class="tab-button active" data-view="library">Biblioteca</button>
+              <button class="tab-button" data-view="gems">Joyitas</button>
+              <button class="tab-button" data-view="discover">A descubrir</button>
+              <button class="tab-button" data-view="loans">Va y vuelve</button>
+            </nav>
+            <label class="search-input-wrap mobile-search" for="searchInputMobile">
+              <span class="search-icon">⌕</span>
+              <input id="searchInputMobile" class="search-input" type="search" placeholder="Buscar..." autocomplete="off" />
+            </label>
+          </div>
+
+          <section class="controls-area">
+            <div class="control-row">
+              <span class="control-label">Orden:</span>
+              <div class="chip-group" id="sortChips">
+                <button class="chip active" data-sort="recent">Recientes</button>
+                <button class="chip" data-sort="year">Año</button>
+                <button class="chip" data-sort="author">Autor</button>
+              </div>
+            </div>
+
+            <div class="control-row mobile-filters mobile-only">
+              <details class="filter-drawer">
+                <summary>Filtros</summary>
+                <div class="drawer-block">
+                  <div class="filter-title">Estado:</div>
+                  <div id="statusFiltersMobile" class="check-list"></div>
+                </div>
+                <div class="drawer-block">
+                  <div class="filter-title">Década:</div>
+                  <div id="decadeFiltersMobile" class="check-list"></div>
+                </div>
+                <div class="drawer-block">
+                  <div class="filter-title">Idioma:</div>
+                  <div id="languageFiltersMobile" class="chip-group"></div>
+                </div>
+              </details>
+            </div>
+
+            <div class="control-row">
+              <div id="decadeQuickFilters" class="chip-group quick-filters"></div>
+            </div>
+            <div class="control-row">
+              <div id="languageQuickFilters" class="chip-group quick-filters"></div>
+            </div>
+          </section>
+
+          <section class="summary-strip" id="summaryStrip"></section>
+          <section id="emptyState" class="empty-state hidden"></section>
+          <section id="cardGrid" class="card-grid"></section>
+        </section>
+      </main>
+    </div>
+
+    <button id="addButton" class="fab" type="button" aria-label="Agregar item">＋</button>
+
+    <nav class="bottom-nav mobile-only" aria-label="Navegación inferior">
+      <button class="bottom-nav-button active" data-view="library">📚 <span>Biblioteca</span></button>
+      <button class="bottom-nav-button" data-view="gems">💎 <span>Joyitas</span></button>
+      <button class="bottom-nav-button" data-view="discover">🧭 <span>A descubrir</span></button>
+      <button class="bottom-nav-button" data-view="loans">👜 <span>Va y vuelve</span></button>
+    </nav>
+  </div>
+
+  <div id="itemModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="true"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="modalTitle">Agregar</h2>
+        <button id="closeModalButton" class="icon-button" type="button" aria-label="Cerrar">✕</button>
+      </div>
+      <form id="itemForm" class="item-form">
+        <div class="form-layout">
+          <div class="image-uploader">
+            <div id="imagePreview" class="image-preview">Sin imagen</div>
+            <label class="upload-button" for="imageInput">📸 Subir imagen</label>
+            <input id="imageInput" name="image" type="file" accept="image/*" capture="environment" hidden />
+          </div>
+
+          <div class="fields-stack">
+            <input name="title" type="text" placeholder="Título..." required />
+            <input name="subtitle" type="text" placeholder="Subtítulo (opcional)..." />
+            <input name="authors" type="text" placeholder="Autor/es..." />
+
+            <div class="field-row two-cols">
+              <label>
+                <span>Tipo</span>
+                <select name="type">
+                  <option>Libro</option>
+                  <option>Revista</option>
+                  <option>Comic</option>
+                  <option>Otro</option>
+                </select>
+              </label>
+              <label>
+                <span>Estado</span>
+                <select name="status">
+                  <option>Biblioteca</option>
+                  <option>Va y vuelve</option>
+                </select>
+              </label>
+            </div>
+
+            <input name="publisher" type="text" placeholder="Editorial..." />
+            <input name="genre" type="text" placeholder="Género..." />
+
+            <div class="field-row three-cols">
+              <input name="year" type="number" inputmode="numeric" placeholder="Año..." min="0" max="9999" />
+              <label>
+                <span>Idioma</span>
+                <select name="language">
+                  <option>Español</option>
+                  <option>Inglés</option>
+                  <option>Francés</option>
+                  <option>Otros</option>
+                </select>
+              </label>
+              <input name="guardian" type="text" placeholder="Guardián..." />
+            </div>
+
+            <input name="loanedTo" type="text" placeholder="Prestado a..." />
+            <textarea name="notes" rows="4" placeholder="Notas..."></textarea>
+
+            <div class="toggle-row">
+              <label class="toggle-option"><input type="checkbox" name="isGem" /> <span>Marcar como joyita</span></label>
+              <label class="toggle-option"><input type="checkbox" name="discover" /> <span>Marcar como a descubrir</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="deleteButton" class="secondary-button hidden" type="button">Eliminar</button>
+          <button class="primary-button" type="submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" data-close-settings="true"></div>
+    <div class="modal-dialog settings-dialog">
+      <div class="modal-header">
+        <h2>Herramientas</h2>
+        <button id="closeSettingsButton" class="icon-button" type="button" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="settings-body">
+        <button id="exportButton" class="secondary-button" type="button">Exportar JSON</button>
+        <label class="secondary-button import-button">
+          Importar JSON
+          <input id="importInput" type="file" accept="application/json" hidden />
+        </label>
+        <button id="resetButton" class="danger-button" type="button">Borrar biblioteca</button>
+      </div>
+    </div>
+  </div>
+
+  <template id="loanHistoryTemplate">
+    <section class="loan-history-panel">
+      <h4>Historial de préstamos</h4>
+      <div class="loan-history-list"></div>
+    </section>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

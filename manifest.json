@@ -1,0 +1,10 @@
+{
+  "name": "Xanadu",
+  "short_name": "Xanadu",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ede2cf",
+  "theme_color": "#a8672f",
+  "description": "Biblioteca viva offline-first para cuidar libros, revistas, cómics y hallazgos.",
+  "icons": []
+}
