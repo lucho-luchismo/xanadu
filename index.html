@@ -57,6 +57,10 @@
             <button class="tab-button" data-view="loans">👜 Va y vuelve</button>
           </nav>
 
+          <div class="mobile-view-strip mobile-only" aria-label="Sección actual">
+            <span id="mobileViewLabel" class="mobile-view-label">Biblioteca</span>
+          </div>
+
           <div class="mobile-toolbar mobile-only">
             <label class="search-input-wrap mobile-search" for="searchInputMobile">
               <span class="search-icon">⌕</span>
@@ -109,6 +113,7 @@
     <nav class="bottom-nav mobile-only" aria-label="Navegación inferior">
       <button class="bottom-nav-button active" data-view="library">📚 <span>Biblioteca</span></button>
       <button class="bottom-nav-button" data-view="gems">💎 <span>Joyitas</span></button>
+      <div class="bottom-nav-center-gap" aria-hidden="true"></div>
       <button class="bottom-nav-button" data-view="discover">🧭 <span>Descubrir</span></button>
       <button class="bottom-nav-button" data-view="loans">👜 <span>Préstamos</span></button>
     </nav>

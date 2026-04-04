@@ -57,6 +57,7 @@ const el = {
   closeSettingsButton: document.getElementById('closeSettingsButton'),
   exportButton: document.getElementById('exportButton'),
   importInput: document.getElementById('importInput'),
+  mobileViewLabel: document.getElementById('mobileViewLabel'),
   resetButton: document.getElementById('resetButton'),
 };
 
