@@ -295,7 +295,7 @@ function renderSummary(items) {
   const gems = items.filter(item => item.isGem).length;
   const discover = items.filter(item => item.discover).length;
   const loans = items.filter(item => item.status === 'Va y vuelve').length;
-  el.summaryStrip.textContent = `${total} item${total === 1 ? '' : 's'} visibles · ${gems} joyita${gems === 1 ? '' : 's'} · ${discover} por descubrir · ${loans} en va y vuelve`;
+  el.summaryStrip.textContent = `${total} ${total === 1 ? 'tesoro visible' : 'tesoros visibles'} · ${gems} joyita${gems === 1 ? '' : 's'} · ${discover} por descubrir · ${loans} en va y vuelve`;
 }
 
 function renderGrid(items) {
@@ -303,7 +303,7 @@ function renderGrid(items) {
   const isEmpty = items.length === 0;
   el.emptyState.classList.toggle('hidden', !isEmpty);
   if (isEmpty) {
-    el.emptyState.innerHTML = `<strong>No hay ítems para mostrar.</strong><br>Probá cambiar la vista, limpiar filtros o agregar tu primer libro.`;
+    el.emptyState.innerHTML = `<strong>Acá todavía no aparece nada.</strong><br>Probá cambiar la vista, soltar filtros o guardar tu primer tesoro.`;
     return;
   }
 
@@ -498,7 +498,7 @@ function handleFormSubmit(event) {
   if (!saved) return;
   render();
   closeItemModal();
-  showNotice('Ítem guardado.', 'success', 1600);
+  showNotice('Tesoro guardado.', 'success', 1600);
 }
 
 function handleDeleteItem() {
