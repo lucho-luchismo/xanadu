@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#a8672f" />
   <title>Xanadu</title>
   <link rel="manifest" href="manifest.json" />
@@ -19,6 +19,8 @@
       </div>
     </header>
 
+    <div id="appNotice" class="app-notice hidden" aria-live="polite"></div>
+
     <div class="main-layout">
       <aside class="sidebar desktop-only">
         <div class="panel search-panel">
@@ -30,17 +32,17 @@
 
         <div class="panel filter-panel">
           <div class="filter-group">
-            <div class="filter-title">Estado:</div>
+            <div class="filter-title">Estado</div>
             <div id="statusFiltersDesktop" class="check-list"></div>
           </div>
 
           <div class="filter-group">
-            <div class="filter-title">Década:</div>
+            <div class="filter-title">Década</div>
             <div id="decadeFiltersDesktop" class="check-list"></div>
           </div>
 
           <div class="filter-group">
-            <div class="filter-title">Idioma:</div>
+            <div class="filter-title">Idioma</div>
             <div id="languageFiltersDesktop" class="chip-group"></div>
           </div>
         </div>
@@ -56,21 +58,30 @@
           </nav>
 
           <div class="mobile-toolbar mobile-only">
-            <nav class="tabs mobile-tabs" aria-label="Secciones móvil">
-              <button class="tab-button active" data-view="library">Biblioteca</button>
-              <button class="tab-button" data-view="gems">Joyitas</button>
-              <button class="tab-button" data-view="discover">A descubrir</button>
-              <button class="tab-button" data-view="loans">Va y vuelve</button>
-            </nav>
             <label class="search-input-wrap mobile-search" for="searchInputMobile">
               <span class="search-icon">⌕</span>
               <input id="searchInputMobile" class="search-input" type="search" placeholder="Buscar..." autocomplete="off" />
             </label>
+            <details class="filter-drawer">
+              <summary>Filtros</summary>
+              <div class="drawer-block">
+                <div class="filter-title">Estado</div>
+                <div id="statusFiltersMobile" class="check-list"></div>
+              </div>
+              <div class="drawer-block">
+                <div class="filter-title">Década</div>
+                <div id="decadeFiltersMobile" class="check-list"></div>
+              </div>
+              <div class="drawer-block">
+                <div class="filter-title">Idioma</div>
+                <div id="languageFiltersMobile" class="chip-group"></div>
+              </div>
+            </details>
           </div>
 
           <section class="controls-area">
-            <div class="control-row">
-              <span class="control-label">Orden:</span>
+            <div class="control-row compact-row">
+              <span class="control-label">Orden</span>
               <div class="chip-group" id="sortChips">
                 <button class="chip active" data-sort="recent">Recientes</button>
                 <button class="chip" data-sort="year">Año</button>
@@ -78,28 +89,10 @@
               </div>
             </div>
 
-            <div class="control-row mobile-filters mobile-only">
-              <details class="filter-drawer">
-                <summary>Filtros</summary>
-                <div class="drawer-block">
-                  <div class="filter-title">Estado:</div>
-                  <div id="statusFiltersMobile" class="check-list"></div>
-                </div>
-                <div class="drawer-block">
-                  <div class="filter-title">Década:</div>
-                  <div id="decadeFiltersMobile" class="check-list"></div>
-                </div>
-                <div class="drawer-block">
-                  <div class="filter-title">Idioma:</div>
-                  <div id="languageFiltersMobile" class="chip-group"></div>
-                </div>
-              </details>
-            </div>
-
-            <div class="control-row">
+            <div class="control-row quick-row">
               <div id="decadeQuickFilters" class="chip-group quick-filters"></div>
             </div>
-            <div class="control-row">
+            <div class="control-row quick-row">
               <div id="languageQuickFilters" class="chip-group quick-filters"></div>
             </div>
           </section>
@@ -116,8 +109,8 @@
     <nav class="bottom-nav mobile-only" aria-label="Navegación inferior">
       <button class="bottom-nav-button active" data-view="library">📚 <span>Biblioteca</span></button>
       <button class="bottom-nav-button" data-view="gems">💎 <span>Joyitas</span></button>
-      <button class="bottom-nav-button" data-view="discover">🧭 <span>A descubrir</span></button>
-      <button class="bottom-nav-button" data-view="loans">👜 <span>Va y vuelve</span></button>
+      <button class="bottom-nav-button" data-view="discover">🧭 <span>Descubrir</span></button>
+      <button class="bottom-nav-button" data-view="loans">👜 <span>Préstamos</span></button>
     </nav>
   </div>
 
@@ -132,8 +125,13 @@
         <div class="form-layout">
           <div class="image-uploader">
             <div id="imagePreview" class="image-preview">Sin imagen</div>
-            <label class="upload-button" for="imageInput">📸 Subir imagen</label>
-            <input id="imageInput" name="image" type="file" accept="image/*" capture="environment" hidden />
+            <div class="upload-actions">
+              <label class="upload-button" for="imageInputCamera">📷 Sacar foto</label>
+              <input id="imageInputCamera" name="imageCamera" type="file" accept="image/*" capture="environment" hidden />
+              <label class="upload-button" for="imageInputFile">🖼 Elegir archivo</label>
+              <input id="imageInputFile" name="imageFile" type="file" accept="image/*" hidden />
+            </div>
+            <div class="upload-help">La imagen se reduce antes de guardarse para evitar fallos en mobile.</div>
           </div>
 
           <div class="fields-stack">
@@ -163,7 +161,7 @@
             <input name="publisher" type="text" placeholder="Editorial..." />
             <input name="genre" type="text" placeholder="Género..." />
 
-            <div class="field-row three-cols">
+            <div class="field-row three-cols desktop-year-row">
               <input name="year" type="number" inputmode="numeric" placeholder="Año..." min="0" max="9999" />
               <label>
                 <span>Idioma</span>
@@ -212,13 +210,6 @@
       </div>
     </div>
   </div>
-
-  <template id="loanHistoryTemplate">
-    <section class="loan-history-panel">
-      <h4>Historial de préstamos</h4>
-      <div class="loan-history-list"></div>
-    </section>
-  </template>
 
   <script src="app.js"></script>
 </body>

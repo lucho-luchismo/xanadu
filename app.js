@@ -10,7 +10,7 @@ const DEFAULT_ITEMS = [
     authors: 'Yuval Noah Harari',
     type: 'Libro',
     publisher: 'Siglo XXI',
-    genre: 'Historia',
+    genre: '',
     year: '2012',
     language: 'Español',
     guardian: '',
@@ -21,80 +21,36 @@ const DEFAULT_ITEMS = [
     loanHistory: [],
     isGem: true,
     discover: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Fundación',
-    subtitle: '',
-    authors: 'Isaac Asimov',
-    type: 'Libro',
-    publisher: 'Planeta',
-    genre: 'Ciencia ficción',
-    year: '1987',
-    language: 'Español',
-    guardian: '',
-    notes: '',
-    image: '',
-    status: 'Biblioteca',
-    loanedTo: '',
-    loanHistory: [],
-    isGem: false,
-    discover: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Sandman',
-    subtitle: '',
-    authors: 'Neil Gaiman',
-    type: 'Comic',
-    publisher: 'ECC',
-    genre: 'Fantasía',
-    year: '2016',
-    language: 'Español',
-    guardian: '',
-    notes: '',
-    image: '',
-    status: 'Va y vuelve',
-    loanedTo: 'Marina',
-    loanHistory: [{ person: 'Marina', date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 18).toISOString() }],
-    isGem: true,
-    discover: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+    createdAt: new Date().toISOString(),
   },
 ];
 
-const state = {
-  items: loadItems(),
-  currentView: 'library',
-  sortBy: 'recent',
-  search: '',
-  filters: {
-    statuses: new Set(),
-    decades: new Set(),
-    languages: new Set(),
-  },
-  editingId: null,
-  lastGuardian: loadSettings().lastGuardian || '',
-};
-
 const el = {
-  cardGrid: document.getElementById('cardGrid'),
-  emptyState: document.getElementById('emptyState'),
-  summaryStrip: document.getElementById('summaryStrip'),
+  appNotice: document.getElementById('appNotice'),
   searchDesktop: document.getElementById('searchInputDesktop'),
   searchMobile: document.getElementById('searchInputMobile'),
+  statusFiltersDesktop: document.getElementById('statusFiltersDesktop'),
+  statusFiltersMobile: document.getElementById('statusFiltersMobile'),
+  decadeFiltersDesktop: document.getElementById('decadeFiltersDesktop'),
+  decadeFiltersMobile: document.getElementById('decadeFiltersMobile'),
+  languageFiltersDesktop: document.getElementById('languageFiltersDesktop'),
+  languageFiltersMobile: document.getElementById('languageFiltersMobile'),
   tabs: [...document.querySelectorAll('.tab-button')],
   bottomNavButtons: [...document.querySelectorAll('.bottom-nav-button')],
   sortChips: [...document.querySelectorAll('#sortChips .chip')],
+  decadeQuickFilters: document.getElementById('decadeQuickFilters'),
+  languageQuickFilters: document.getElementById('languageQuickFilters'),
+  summaryStrip: document.getElementById('summaryStrip'),
+  emptyState: document.getElementById('emptyState'),
+  cardGrid: document.getElementById('cardGrid'),
   addButton: document.getElementById('addButton'),
   itemModal: document.getElementById('itemModal'),
   modalTitle: document.getElementById('modalTitle'),
   closeModalButton: document.getElementById('closeModalButton'),
   itemForm: document.getElementById('itemForm'),
-  imageInput: document.getElementById('imageInput'),
   imagePreview: document.getElementById('imagePreview'),
+  imageInputCamera: document.getElementById('imageInputCamera'),
+  imageInputFile: document.getElementById('imageInputFile'),
   deleteButton: document.getElementById('deleteButton'),
   settingsButton: document.getElementById('settingsButton'),
   settingsModal: document.getElementById('settingsModal'),
@@ -102,21 +58,28 @@ const el = {
   exportButton: document.getElementById('exportButton'),
   importInput: document.getElementById('importInput'),
   resetButton: document.getElementById('resetButton'),
-  statusFiltersDesktop: document.getElementById('statusFiltersDesktop'),
-  decadeFiltersDesktop: document.getElementById('decadeFiltersDesktop'),
-  languageFiltersDesktop: document.getElementById('languageFiltersDesktop'),
-  statusFiltersMobile: document.getElementById('statusFiltersMobile'),
-  decadeFiltersMobile: document.getElementById('decadeFiltersMobile'),
-  languageFiltersMobile: document.getElementById('languageFiltersMobile'),
-  decadeQuickFilters: document.getElementById('decadeQuickFilters'),
-  languageQuickFilters: document.getElementById('languageQuickFilters'),
+};
+
+const state = {
+  items: [],
+  search: '',
+  currentView: 'library',
+  sortBy: 'recent',
+  editingId: null,
+  lastGuardian: '',
+  filters: {
+    statuses: new Set(),
+    decades: new Set(),
+    languages: new Set(),
+  },
 };
 
 init();
 
 function init() {
+  state.items = loadItems();
+  state.lastGuardian = loadSettings().lastGuardian || '';
   bindEvents();
-  renderFilters();
   render();
   registerServiceWorker();
 }
@@ -124,7 +87,6 @@ function init() {
 function bindEvents() {
   el.searchDesktop?.addEventListener('input', onSearchInput);
   el.searchMobile?.addEventListener('input', onSearchInput);
-
   el.tabs.forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
   el.bottomNavButtons.forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
   el.sortChips.forEach(button => button.addEventListener('click', () => setSort(button.dataset.sort)));
@@ -132,7 +94,8 @@ function bindEvents() {
   el.addButton.addEventListener('click', () => openItemModal());
   el.closeModalButton.addEventListener('click', closeItemModal);
   el.itemForm.addEventListener('submit', handleFormSubmit);
-  el.imageInput.addEventListener('change', handleImageChange);
+  el.imageInputCamera.addEventListener('change', handleImageChange);
+  el.imageInputFile.addEventListener('change', handleImageChange);
   el.deleteButton.addEventListener('click', handleDeleteItem);
 
   el.settingsButton.addEventListener('click', openSettingsModal);
@@ -159,7 +122,7 @@ function bindEvents() {
 function loadItems() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (Array.isArray(saved) && saved.length) return saved;
+    if (Array.isArray(saved)) return saved;
   } catch {}
   localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_ITEMS));
   return DEFAULT_ITEMS;
@@ -173,9 +136,17 @@ function loadSettings() {
   }
 }
 
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ lastGuardian: state.lastGuardian }));
+function save(showMessage = true) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ lastGuardian: state.lastGuardian }));
+    if (showMessage) showNotice('Cambios guardados.', 'success', 1200);
+    return true;
+  } catch (error) {
+    console.error(error);
+    showNotice('No se pudo guardar. Probá con una imagen más liviana o exportá y liberá espacio del navegador.', 'error', 5000);
+    return false;
+  }
 }
 
 function onSearchInput(event) {
@@ -202,6 +173,13 @@ function syncActiveButtons() {
   el.bottomNavButtons.forEach(button => button.classList.toggle('active', button.dataset.view === state.currentView));
 }
 
+function render() {
+  renderFilters();
+  const items = getVisibleItems();
+  renderSummary(items);
+  renderGrid(items);
+}
+
 function renderFilters() {
   const statuses = ['Biblioteca', 'A descubrir', 'Va y vuelve'];
   const decades = [...new Set(state.items.map(item => deriveDecade(item.year)).filter(Boolean))].sort();
@@ -211,11 +189,10 @@ function renderFilters() {
   renderCheckList(el.statusFiltersMobile, statuses, state.filters.statuses, toggleStatusFilter);
   renderCheckList(el.decadeFiltersDesktop, decades, state.filters.decades, toggleDecadeFilter);
   renderCheckList(el.decadeFiltersMobile, decades, state.filters.decades, toggleDecadeFilter);
-  renderChipSelector(el.languageFiltersDesktop, languages, state.filters.languages, toggleLanguageFilter, true);
-  renderChipSelector(el.languageFiltersMobile, languages, state.filters.languages, toggleLanguageFilter, true);
-
-  renderChipSelector(el.decadeQuickFilters, decades, state.filters.decades, toggleDecadeFilter, false);
-  renderChipSelector(el.languageQuickFilters, ['ES', 'EN', 'FR', 'Otros'], new Set([...state.filters.languages].map(shortLanguage)), toggleQuickLanguage, false);
+  renderChipSelector(el.languageFiltersDesktop, languages, state.filters.languages, toggleLanguageFilter);
+  renderChipSelector(el.languageFiltersMobile, languages, state.filters.languages, toggleLanguageFilter);
+  renderChipSelector(el.decadeQuickFilters, decades, state.filters.decades, toggleDecadeFilter);
+  renderChipSelector(el.languageQuickFilters, ['ES', 'EN', 'FR', 'Otros'], new Set([...state.filters.languages].map(shortLanguage)), toggleQuickLanguage);
 }
 
 function renderCheckList(container, values, selectedSet, onToggle) {
@@ -231,14 +208,14 @@ function renderCheckList(container, values, selectedSet, onToggle) {
   });
 }
 
-function renderChipSelector(container, values, selectedSet, onToggle, useFullLanguageNames) {
+function renderChipSelector(container, values, selectedSet, onToggle) {
   if (!container) return;
   container.innerHTML = '';
   values.forEach(value => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = `chip ${selectedSet.has(value) ? 'active' : ''}`;
-    button.textContent = useFullLanguageNames ? value : value;
+    button.textContent = value;
     button.addEventListener('click', () => onToggle(value));
     container.appendChild(button);
   });
@@ -246,39 +223,28 @@ function renderChipSelector(container, values, selectedSet, onToggle, useFullLan
 
 function toggleStatusFilter(value) {
   toggleSetValue(state.filters.statuses, value);
-  renderFilters();
   render();
 }
 
 function toggleDecadeFilter(value) {
   toggleSetValue(state.filters.decades, value);
-  renderFilters();
   render();
 }
 
 function toggleLanguageFilter(value) {
   toggleSetValue(state.filters.languages, value);
-  renderFilters();
   render();
 }
 
 function toggleQuickLanguage(shortValue) {
   const mapping = { ES: 'Español', EN: 'Inglés', FR: 'Francés', Otros: 'Otros' };
   toggleSetValue(state.filters.languages, mapping[shortValue]);
-  renderFilters();
   render();
 }
 
 function toggleSetValue(set, value) {
   if (set.has(value)) set.delete(value);
   else set.add(value);
-}
-
-function render() {
-  const items = getVisibleItems();
-  renderFilters();
-  renderSummary(items);
-  renderGrid(items);
 }
 
 function getVisibleItems() {
@@ -292,10 +258,7 @@ function getVisibleItems() {
 
   if (state.filters.statuses.size) {
     items = items.filter(item => {
-      const statesForItem = new Set([
-        item.status,
-        item.discover ? 'A descubrir' : null,
-      ].filter(Boolean));
+      const statesForItem = new Set([item.status, item.discover ? 'A descubrir' : null].filter(Boolean));
       return [...state.filters.statuses].some(filter => statesForItem.has(filter));
     });
   }
@@ -332,7 +295,7 @@ function renderSummary(items) {
   const gems = items.filter(item => item.isGem).length;
   const discover = items.filter(item => item.discover).length;
   const loans = items.filter(item => item.status === 'Va y vuelve').length;
-  el.summaryStrip.textContent = `${total} item${total === 1 ? '' : 's'} · ${gems} joyita${gems === 1 ? '' : 's'} · ${discover} por descubrir · ${loans} en va y vuelve`;
+  el.summaryStrip.textContent = `${total} item${total === 1 ? '' : 's'} visibles · ${gems} joyita${gems === 1 ? '' : 's'} · ${discover} por descubrir · ${loans} en va y vuelve`;
 }
 
 function renderGrid(items) {
@@ -340,7 +303,7 @@ function renderGrid(items) {
   const isEmpty = items.length === 0;
   el.emptyState.classList.toggle('hidden', !isEmpty);
   if (isEmpty) {
-    el.emptyState.textContent = 'No hay resultados para esta combinación de vista, filtros y búsqueda.';
+    el.emptyState.innerHTML = `<strong>No hay ítems para mostrar.</strong><br>Probá cambiar la vista, limpiar filtros o agregar tu primer libro.`;
     return;
   }
 
@@ -349,14 +312,13 @@ function renderGrid(items) {
     article.className = 'item-card';
     article.dataset.cardId = item.id;
 
-    const cover = renderCover(item);
     const decade = deriveDecade(item.year);
     const loanHistoryHTML = item.loanHistory?.length
       ? `<section class="loan-history-panel"><h4>Historial de préstamos</h4><div class="loan-history-list">${item.loanHistory.map(entry => `<div class="loan-entry">${escapeHTML(entry.person)} · ${formatDate(entry.date)}</div>`).join('')}</div></section>`
       : '';
 
     article.innerHTML = `
-      <div class="cover">${cover}</div>
+      <div class="cover">${renderCover(item)}</div>
       <div class="card-body">
         <div class="card-title">${escapeHTML(item.title)}</div>
         ${item.subtitle ? `<div class="card-subtitle">${escapeHTML(item.subtitle)}</div>` : ''}
@@ -364,14 +326,17 @@ function renderGrid(items) {
         <div class="badge-row">
           <span class="badge">${escapeHTML(item.type || 'Objeto')}</span>
           ${item.status === 'Va y vuelve' ? `<span class="badge loan-badge">Prestado${item.loanedTo ? ` a ${escapeHTML(item.loanedTo)}` : ''}</span>` : ''}
-          ${decade ? `<span class="badge">${escapeHTML(decade)}</span>` : ''}
+          ${decade ? `<span class="badge">${decade}</span>` : ''}
+          ${item.language ? `<span class="badge">${shortLanguage(item.language)}</span>` : ''}
         </div>
-        <div class="card-meta">${[item.publisher, item.year].filter(Boolean).map(escapeHTML).join(' · ')}</div>
-        <div class="card-foot">${[shortLanguage(item.language), item.guardian].filter(Boolean).map(escapeHTML).join(' · ')}</div>
+        ${item.publisher || item.year ? `<div class="card-meta">${[item.publisher, item.year].filter(Boolean).join(' · ')}</div>` : ''}
+        ${item.guardian ? `<div class="card-foot">Guardián: ${escapeHTML(item.guardian)}</div>` : ''}
         <div class="card-actions">
           <button class="action-pill ${item.isGem ? 'active' : ''}" data-action="toggle-gem" data-id="${item.id}">💎 Joyita</button>
           <button class="action-pill ${item.discover ? 'active' : ''}" data-action="toggle-discover" data-id="${item.id}">🧭 Descubrir</button>
-          ${item.status === 'Va y vuelve' ? `<button class="action-pill active" data-action="toggle-status" data-id="${item.id}">👜 Va y vuelve</button>` : `<button class="action-pill" data-action="toggle-status" data-id="${item.id}">📚 Biblioteca</button>`}
+          ${item.status === 'Va y vuelve'
+            ? `<button class="action-pill active" data-action="toggle-status" data-id="${item.id}">👜 Va y vuelve</button>`
+            : `<button class="action-pill" data-action="toggle-status" data-id="${item.id}">📚 Biblioteca</button>`}
         </div>
         ${loanHistoryHTML}
       </div>
@@ -391,7 +356,7 @@ function handleCardAction(action, id) {
 
   if (action === 'toggle-gem') {
     if (!item.isGem && state.items.filter(entry => entry.isGem).length >= GEM_LIMIT) {
-      alert(`Joyitas tiene un límite blando de ${GEM_LIMIT}. Podés seguir, pero conviene cuidar la selección.`);
+      alert(`Joyitas tiene un límite blando de ${GEM_LIMIT}.`);
     }
     item.isGem = !item.isGem;
   }
@@ -420,7 +385,8 @@ function handleCardAction(action, id) {
 function openItemModal(id = null) {
   state.editingId = id;
   el.itemForm.reset();
-  el.imageInput.value = '';
+  el.imageInputCamera.value = '';
+  el.imageInputFile.value = '';
   el.imagePreview.innerHTML = 'Sin imagen';
   delete el.imagePreview.dataset.image;
   el.deleteButton.classList.toggle('hidden', !id);
@@ -437,11 +403,13 @@ function openItemModal(id = null) {
     el.itemForm.elements.guardian.value = state.lastGuardian || '';
   }
 
+  document.body.classList.add('modal-open');
   el.itemModal.classList.remove('hidden');
   el.itemModal.setAttribute('aria-hidden', 'false');
 }
 
 function closeItemModal() {
+  document.body.classList.remove('modal-open');
   el.itemModal.classList.add('hidden');
   el.itemModal.setAttribute('aria-hidden', 'true');
   state.editingId = null;
@@ -454,26 +422,44 @@ function fillForm(item) {
     if (field.type === 'checkbox') field.checked = Boolean(value);
     else field.value = value ?? '';
   }
-  if (item.image) { el.imagePreview.innerHTML = `<img src="${item.image}" alt="Vista previa">`; el.imagePreview.dataset.image = item.image; }
+  if (item.image) {
+    el.imagePreview.innerHTML = `<img src="${item.image}" alt="Vista previa">`;
+    el.imagePreview.dataset.image = item.image;
+  }
 }
 
 async function handleImageChange(event) {
   const file = event.target.files?.[0];
   if (!file) return;
-  const base64 = await fileToBase64(file);
-  el.imagePreview.innerHTML = `<img src="${base64}" alt="Vista previa">`;
-  el.imagePreview.dataset.image = base64;
+  try {
+    showNotice('Procesando imagen…', 'info', 2000);
+    const base64 = await prepareImageForStorage(file);
+    el.imagePreview.innerHTML = `<img src="${base64}" alt="Vista previa">`;
+    el.imagePreview.dataset.image = base64;
+    showNotice('Imagen lista para guardar.', 'success', 2000);
+  } catch (error) {
+    console.error(error);
+    showNotice('No se pudo procesar la imagen.', 'error', 3200);
+  } finally {
+    event.target.value = '';
+  }
 }
 
 function handleFormSubmit(event) {
   event.preventDefault();
   const form = new FormData(el.itemForm);
   const existing = state.editingId ? state.items.find(entry => entry.id === state.editingId) : null;
-  const status = form.get('status') || 'Biblioteca';
+  const title = String(form.get('title') || '').trim();
+  if (!title) {
+    showNotice('El título es obligatorio.', 'error', 2600);
+    return;
+  }
+
+  const status = String(form.get('status') || 'Biblioteca');
   const loanedTo = String(form.get('loanedTo') || '').trim();
   const nextItem = {
     id: existing?.id || crypto.randomUUID(),
-    title: String(form.get('title') || '').trim(),
+    title,
     subtitle: String(form.get('subtitle') || '').trim(),
     authors: String(form.get('authors') || '').trim(),
     type: String(form.get('type') || 'Libro'),
@@ -508,27 +494,33 @@ function handleFormSubmit(event) {
     state.items.unshift(nextItem);
   }
 
-  save();
+  const saved = save(false);
+  if (!saved) return;
   render();
   closeItemModal();
+  showNotice('Ítem guardado.', 'success', 1600);
 }
 
 function handleDeleteItem() {
   if (!state.editingId) return;
-  const confirmed = confirm('¿Eliminar este item? Esta acción no se puede deshacer.');
+  const confirmed = confirm('¿Eliminar este ítem? Esta acción no se puede deshacer.');
   if (!confirmed) return;
   state.items = state.items.filter(item => item.id !== state.editingId);
-  save();
+  const saved = save(false);
+  if (!saved) return;
   render();
   closeItemModal();
+  showNotice('Ítem eliminado.', 'success', 1600);
 }
 
 function openSettingsModal() {
+  document.body.classList.add('modal-open');
   el.settingsModal.classList.remove('hidden');
   el.settingsModal.setAttribute('aria-hidden', 'false');
 }
 
 function closeSettingsModal() {
+  document.body.classList.remove('modal-open');
   el.settingsModal.classList.add('hidden');
   el.settingsModal.setAttribute('aria-hidden', 'true');
 }
@@ -553,12 +545,12 @@ function importJson(event) {
       const parsed = JSON.parse(reader.result);
       if (!Array.isArray(parsed)) throw new Error('Formato inválido');
       state.items = parsed;
-      save();
+      save(false);
       render();
       closeSettingsModal();
-      alert('Biblioteca importada correctamente.');
+      showNotice('Biblioteca importada correctamente.', 'success', 2400);
     } catch {
-      alert('No se pudo importar el archivo JSON.');
+      showNotice('No se pudo importar el archivo JSON.', 'error', 2800);
     }
   };
   reader.readAsText(file);
@@ -568,9 +560,10 @@ function resetLibrary() {
   const confirmed = confirm('¿Seguro que querés borrar toda la biblioteca local?');
   if (!confirmed) return;
   state.items = [];
-  save();
+  save(false);
   render();
   closeSettingsModal();
+  showNotice('Biblioteca vaciada.', 'success', 2200);
 }
 
 function deriveDecade(year) {
@@ -608,6 +601,53 @@ function fileToBase64(file) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+async function prepareImageForStorage(file) {
+  const dataUrl = await fileToBase64(file);
+  const image = await loadImage(dataUrl);
+  const width = image.naturalWidth || image.width;
+  const height = image.naturalHeight || image.height;
+  const maxLongEdge = 960;
+  const scale = Math.min(1, maxLongEdge / Math.max(width, height));
+  const targetWidth = Math.max(1, Math.round(width * scale));
+  const targetHeight = Math.max(1, Math.round(height * scale));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+
+  const ctx = canvas.getContext('2d', { alpha: false });
+  ctx.fillStyle = '#efe2cc';
+  ctx.fillRect(0, 0, targetWidth, targetHeight);
+  ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+  let quality = 0.72;
+  let output = canvas.toDataURL('image/jpeg', quality);
+  while (output.length > 800000 && quality > 0.46) {
+    quality -= 0.08;
+    output = canvas.toDataURL('image/jpeg', quality);
+  }
+  return output;
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+
+function showNotice(message, tone = 'info', timeout = 2400) {
+  if (!el.appNotice) return;
+  el.appNotice.textContent = message;
+  el.appNotice.className = `app-notice ${tone}`;
+  if (showNotice.timer) clearTimeout(showNotice.timer);
+  showNotice.timer = setTimeout(() => {
+    el.appNotice.className = 'app-notice hidden';
+  }, timeout);
 }
 
 function escapeHTML(value) {
